@@ -17,7 +17,8 @@ type MenuCategory struct {
 type Ingredient struct {
 	ID          int            `json:"id"`
 	Name        string         `json:"name"`
-	Qty         int            `json:"qty"`
+	Qty         float64        `json:"qty"`
+	Unit        string         `json:"unit"`
 	IsAllergen  bool           `json:"is_allergen"`
 	IsActive    bool           `json:"is_active"`
 	Description sql.NullString `json:"description"`
@@ -45,11 +46,18 @@ type MenuItem struct {
 
 // Menu Ingredients
 type MenuIngredient struct {
-	ID           int     `json:"id"`
-	MenuItemID   int     `json:"menu_item_id"`
-	IngredientID int     `json:"ingredient_id"`
-	Quantity     float64 `json:"quantity"`
-	Unit         string  `json:"unit"`
-	IsRemovable  bool    `json:"is_removable"`
-	IsDefault    bool    `json:"is_default"`
+	ID           int       `json:"id"`
+	MenuItemID   int       `json:"menu_item_id"`
+	IngredientID int       `json:"ingredient_id"`
+	Qty          float64   `json:"qty"`
+	IsRemovable  bool      `json:"is_removable"`
+	IsDefault    bool      `json:"is_default"`
+	CreatedAt    time.Time `json:"created_at"`
+	UpdatedAt    time.Time `json:"updated_at"`
+}
+
+// Menu details with ingredients
+type MenuItemWithIngredients struct {
+	MenuItem
+	Ingredients []Ingredient `json:"ingredients"`
 }

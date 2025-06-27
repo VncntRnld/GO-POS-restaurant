@@ -64,20 +64,22 @@ func (h *MenuItemHandler) CreateMenuItem(c *gin.Context) {
 	c.JSON(http.StatusCreated, gin.H{"id": id, "name": menuItem.Name})
 }
 
-func (h *MenuItemHandler) ListMenuItemsById(c *gin.Context) {
-	idStr := c.Param("id")
-	id, err := strconv.Atoi(idStr)
+func (h *MenuItemHandler) GetMenuItemsByCategory(c *gin.Context) {
+	categoryIDStr := c.Query("category_id")
+	categoryID, err := strconv.Atoi(categoryIDStr)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "ID harus berupa angka"})
+		log.Printf("Parameter category_id tidak valid: %v", err)
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Parameter category_id tidak valid"})
 		return
 	}
 
-	items, err := h.service.ListMenuItemsById(c.Request.Context(), id)
+	items, err := h.service.GetMenuItemsByCategory(c.Request.Context(), categoryID)
 	if err != nil {
-		log.Printf("[ListMenuItemsById] Gagal mengambil data menu: %v", err)
+		log.Printf("Gagal mengambil menu berdasarkan kategori: %v", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal mengambil data menu"})
 		return
 	}
+
 	c.JSON(http.StatusOK, items)
 }
 
@@ -176,4 +178,28 @@ func (h *MenuItemHandler) DeleteMenuItem(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "Menu berhasil dihapus (soft delete)"})
+}
+
+// Get Details with multiple tables
+func (h *MenuItemHandler) GetMenuDetail(c *gin.Context) {
+	idStr := c.Param("id")
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		log.Printf("ID menu tidak valid: %v", err)
+		c.JSON(http.StatusBadRequest, gin.H{"error": "ID tidak valid"})
+		return
+	}
+
+	menu, err := h.service.GetMenuWithIngredients(c.Request.Context(), id)
+	if err != nil {
+		log.Printf("Gagal mengambil detail menu: %v", err)
+		if err == sql.ErrNoRows {
+			c.JSON(http.StatusNotFound, gin.H{"error": "Menu tidak ditemukan"})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal mengambil data menu"})
+		return
+	}
+
+	c.JSON(http.StatusOK, menu)
 }

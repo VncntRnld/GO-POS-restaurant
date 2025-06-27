@@ -17,10 +17,10 @@ func NewIngredientRepository(db *sql.DB) *IngredientRepository {
 func (r *IngredientRepository) Create(ctx context.Context, ing *models.Ingredient) (int, error) {
 	var id int
 	err := r.db.QueryRowContext(ctx, `
-		INSERT INTO ingredients (name, qty, is_allergen, is_active, description)
-		VALUES ($1, $2, $3, $4, $5)
+		INSERT INTO ingredients (name, qty, unit, is_allergen, is_active, description)
+		VALUES ($1, $2, $3, $4, $5, $6)
 		RETURNING id`,
-		ing.Name, ing.Qty, ing.IsAllergen, ing.IsActive, ing.Description,
+		ing.Name, ing.Qty, ing.Unit, ing.IsAllergen, ing.IsActive, ing.Description,
 	).Scan(&id)
 
 	if err != nil {
@@ -31,7 +31,7 @@ func (r *IngredientRepository) Create(ctx context.Context, ing *models.Ingredien
 
 func (r *IngredientRepository) List(ctx context.Context) ([]*models.Ingredient, error) {
 	rows, err := r.db.QueryContext(ctx, `
-		SELECT id, name, qty, is_allergen, is_active, description FROM ingredients
+		SELECT id, name, qty, unit, is_allergen, is_active, description FROM ingredients
 		WHERE deleted_at IS NULL
 		ORDER BY name`)
 	if err != nil {
@@ -44,7 +44,7 @@ func (r *IngredientRepository) List(ctx context.Context) ([]*models.Ingredient, 
 		var ing models.Ingredient
 		var desc sql.NullString
 
-		err := rows.Scan(&ing.ID, &ing.Name, &ing.Qty, &ing.IsAllergen, &ing.IsActive, &desc)
+		err := rows.Scan(&ing.ID, &ing.Name, &ing.Qty, &ing.Unit, &ing.IsAllergen, &ing.IsActive, &desc)
 		if err != nil {
 			return nil, err
 		}
@@ -54,16 +54,44 @@ func (r *IngredientRepository) List(ctx context.Context) ([]*models.Ingredient, 
 	return ingredients, nil
 }
 
+func (r *IngredientRepository) GetByID(ctx context.Context, id int) (*models.Ingredient, error) {
+	query := `
+		SELECT id, name, qty, unit, is_allergen, is_active, description
+		FROM ingredients
+		WHERE id = $1 AND deleted_at IS NULL
+	`
+
+	row := r.db.QueryRowContext(ctx, query, id)
+	var ingredient models.Ingredient
+
+	err := row.Scan(
+		&ingredient.ID,
+		&ingredient.Name,
+		&ingredient.Qty,
+		&ingredient.Unit,
+		&ingredient.IsAllergen,
+		&ingredient.IsActive,
+		&ingredient.Description,
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &ingredient, nil
+}
+
 func (r *IngredientRepository) Update(ctx context.Context, ing *models.Ingredient) error {
 	_, err := r.db.ExecContext(ctx, `
 		UPDATE ingredients SET 
 			name = $1,
 			qty = $2,
-			is_allergen = $3,
-			is_active = $4,
-			description = $5
-		WHERE id = $6 AND deleted_at IS NULL
-	`, ing.Name, ing.Qty, ing.IsAllergen, ing.IsActive, ing.Description, ing.ID)
+			unit = $3,
+			is_allergen = $4,
+			is_active = $5,
+			description = $6
+		WHERE id = $7 AND deleted_at IS NULL
+	`, ing.Name, ing.Qty, ing.Unit, ing.IsAllergen, ing.IsActive, ing.Description, ing.ID)
 
 	return err
 }

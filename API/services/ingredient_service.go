@@ -22,6 +22,10 @@ func (s *IngredientService) ListIngredients(ctx context.Context) ([]*models.Ingr
 	return s.repo.List(ctx)
 }
 
+func (s *IngredientService) GetIngredientByID(ctx context.Context, id int) (*models.Ingredient, error) {
+	return s.repo.GetByID(ctx, id)
+}
+
 func (s *IngredientService) UpdateIngredient(ctx context.Context, ing *models.Ingredient) error {
 	return s.repo.Update(ctx, ing)
 }

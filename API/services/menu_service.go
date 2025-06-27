@@ -22,8 +22,8 @@ func (s *MenuService) CreateMenuItem(ctx context.Context, item *models.MenuItem)
 	return s.repo.Create(ctx, item)
 }
 
-func (s *MenuService) ListMenuItemsById(ctx context.Context, id int) (*models.MenuItem, error) {
-	return s.repo.GetByID(ctx, id)
+func (s *MenuService) GetMenuItemsByCategory(ctx context.Context, categoryID int) ([]*models.MenuItem, error) {
+	return s.repo.GetByCategoryID(ctx, categoryID)
 }
 
 func (s *MenuService) ListMenuItems(ctx context.Context) ([]*models.MenuItem, error) {
@@ -44,4 +44,9 @@ func (s *MenuService) UpdateMenuItem(ctx context.Context, item *models.MenuItem)
 
 func (s *MenuService) DeleteMenuItem(ctx context.Context, id int) error {
 	return s.repo.SoftDelete(ctx, id)
+}
+
+// Multiple Tables
+func (s *MenuService) GetMenuWithIngredients(ctx context.Context, id int) (*models.MenuItemWithIngredients, error) {
+	return s.repo.GetMenuWithIngredients(ctx, id)
 }

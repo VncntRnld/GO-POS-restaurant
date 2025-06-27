@@ -4,7 +4,11 @@ CREATE TABLE outlets (
     location VARCHAR(255),
     service_charge_percentage DECIMAL(5,2) DEFAULT 10,
     tax_percentage DECIMAL(5,2) DEFAULT 10,
-    is_active BOOLEAN DEFAULT TRUE
+    is_active BOOLEAN DEFAULT TRUE,
+
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW(),
+    deleted_at TIMESTAMP DEFAULT NULL
 );
 
 CREATE TYPE table_type AS ENUM ('Indoor', 'Outdoor');
@@ -14,7 +18,11 @@ CREATE TABLE tables (
     table_number VARCHAR(50) NOT NULL,
     capacity INT NOT NULL,
     location_type table_type,
-    status VARCHAR(20) DEFAULT 'available' CHECK (status IN ('available', 'occupied', 'reserved', 'out_of_order'))
+    status VARCHAR(20) DEFAULT 'available' CHECK (status IN ('available', 'occupied', 'reserved', 'out_of_order')),
+
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW(),
+    deleted_at TIMESTAMP DEFAULT NULL
 );
 
 -- Contoh untuk disambungkan ke data dari HRD
@@ -23,7 +31,11 @@ CREATE TABLE staff (
     name VARCHAR(255) NOT NULL,
     role VARCHAR(50) NOT NULL CHECK (role IN ('waiter', 'cashier', 'chef', 'manager', 'supervisor')),
     pin_code VARCHAR(10) NOT NULL, -- Untuk login POS
-    is_active BOOLEAN DEFAULT TRUE
+    is_active BOOLEAN DEFAULT TRUE,
+
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW(),
+    deleted_at TIMESTAMP DEFAULT NULL
 );
 
 -- Menu
@@ -37,7 +49,8 @@ CREATE TABLE menu_categories (
 CREATE TABLE ingredients (
     id SERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL UNIQUE,
-    qty INT DEFAULT 0,
+    quantity DECIMAL(6,2) NOT NULL,    -- Jumlah bahan (e.g. 100 gram)
+    unit VARCHAR(20) NOT NULL,          -- Satuan (gram, ml, pcs)
     is_allergen BOOLEAN DEFAULT FALSE,  -- Bahan penyebab alergi umum
     is_active BOOLEAN DEFAULT TRUE,      -- Untuk toggle on/off
     description TEXT,                   -- Deskripsi alergi (e.g. "Kacang Almond")
@@ -73,9 +86,10 @@ CREATE TABLE menu_ingredients (
     menu_item_id INT REFERENCES menu_items(id) ON DELETE CASCADE,   
     ingredient_id INT REFERENCES ingredients(id) ON DELETE CASCADE,
     quantity DECIMAL(6,2) NOT NULL,    -- Jumlah bahan (e.g. 100 gram)
-    unit VARCHAR(20) NOT NULL,          -- Satuan (gram, ml, pcs)
     is_removable BOOLEAN DEFAULT TRUE,  -- Bisa dihapus saat pemesanan
-    is_default BOOLEAN DEFAULT TRUE     -- Termasuk bahan pasti ada
+    is_default BOOLEAN DEFAULT TRUE,     -- Termasuk bahan pasti ada
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
 );
 
 CREATE TABLE sales_analysis_daily (

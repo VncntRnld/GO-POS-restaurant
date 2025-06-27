@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"encoding/json"
-	"errors"
 	"pos-restaurant/models"
 )
 
@@ -77,52 +76,6 @@ func (r *MenuItemRepository) Update(ctx context.Context, item *models.MenuItem) 
 	return err
 }
 
-func (r *MenuItemRepository) GetByID(ctx context.Context, id int) (*models.MenuItem, error) {
-	item := &models.MenuItem{}
-	var tagsJSON []byte
-	var description sql.NullString
-	var prepTime sql.NullInt64
-
-	err := r.db.QueryRowContext(ctx, `
-		SELECT
-			id, category_id, sku, name, description, price, cost,
-			is_active, preparation_time, tags, created_at, updated_at
-		FROM menu_items
-		WHERE id = $1 AND deleted_at IS NULL
-	`, id).Scan(
-		&item.ID,
-		&item.CategoryID,
-		&item.SKU,
-		&item.Name,
-		&description,
-		&item.Price,
-		&item.Cost,
-		&item.IsActive,
-		&prepTime,
-		&tagsJSON,
-		&item.CreatedAt,
-		&item.UpdatedAt,
-	)
-
-	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return nil, errors.New("menu item not found")
-		}
-		return nil, err
-	}
-
-	// Handle nullable fields
-	item.Description = description
-	item.PreparationTime = prepTime
-
-	// Parse JSON tags
-	if len(tagsJSON) > 0 {
-		json.Unmarshal(tagsJSON, &item.Tags)
-	}
-
-	return item, nil
-}
-
 func (r *MenuItemRepository) List(ctx context.Context) ([]*models.MenuItem, error) {
 	rows, err := r.db.QueryContext(ctx, `
 		SELECT 
@@ -137,6 +90,53 @@ func (r *MenuItemRepository) List(ctx context.Context) ([]*models.MenuItem, erro
 		return nil, err
 	}
 
+	defer rows.Close()
+
+	var items []*models.MenuItem
+	for rows.Next() {
+		var item models.MenuItem
+		var tagsJSON []byte
+		var description sql.NullString
+		var prepTime sql.NullInt64
+
+		err := rows.Scan(
+			&item.ID,
+			&item.CategoryID,
+			&item.SKU,
+			&item.Name,
+			&description,
+			&item.Price,
+			&item.Cost,
+			&item.IsActive,
+			&prepTime,
+			&tagsJSON,
+		)
+		if err != nil {
+			return nil, err
+		}
+
+		item.Description = description
+		item.PreparationTime = prepTime
+		json.Unmarshal(tagsJSON, &item.Tags)
+
+		items = append(items, &item)
+	}
+
+	return items, nil
+}
+
+func (r *MenuItemRepository) GetByCategoryID(ctx context.Context, categoryID int) ([]*models.MenuItem, error) {
+	rows, err := r.db.QueryContext(ctx, `
+		SELECT 
+			id, category_id, sku, name, description, price, cost,
+			is_active, preparation_time, tags
+		FROM menu_items
+		WHERE category_id = $1 AND deleted_at IS NULL AND is_active = TRUE
+		ORDER BY name
+	`, categoryID)
+	if err != nil {
+		return nil, err
+	}
 	defer rows.Close()
 
 	var items []*models.MenuItem

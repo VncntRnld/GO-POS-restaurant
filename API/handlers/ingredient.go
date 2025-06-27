@@ -20,16 +20,18 @@ func NewIngredientHandler(service *services.IngredientService) *IngredientHandle
 }
 
 type CreateIngredientRequest struct {
-	Name        string `json:"name" binding:"required"`
-	Qty         int    `json:"qty"`
-	IsAllergen  bool   `json:"is_allergen"`
-	IsActive    bool   `json:"is_active"`
-	Description string `json:"description"`
+	Name        string  `json:"name" binding:"required"`
+	Qty         float64 `json:"qty"`
+	Unit        string  `json:"unit"`
+	IsAllergen  bool    `json:"is_allergen"`
+	IsActive    bool    `json:"is_active"`
+	Description string  `json:"description"`
 }
 
 func (h *IngredientHandler) CreateIngredient(c *gin.Context) {
 	var req CreateIngredientRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
+		log.Printf("Error parsing request body: %v", err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
@@ -37,6 +39,7 @@ func (h *IngredientHandler) CreateIngredient(c *gin.Context) {
 	ingredient := &models.Ingredient{
 		Name:        req.Name,
 		Qty:         req.Qty,
+		Unit:        req.Unit,
 		IsAllergen:  req.IsAllergen,
 		IsActive:    req.IsActive,
 		Description: sql.NullString{String: req.Description, Valid: req.Description != ""},
@@ -44,6 +47,7 @@ func (h *IngredientHandler) CreateIngredient(c *gin.Context) {
 
 	id, err := h.service.CreateIngredient(c.Request.Context(), ingredient)
 	if err != nil {
+		log.Printf("Error creating ingredient: %v", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal membuat ingredient"})
 		return
 	}
@@ -54,22 +58,44 @@ func (h *IngredientHandler) CreateIngredient(c *gin.Context) {
 func (h *IngredientHandler) ListIngredients(c *gin.Context) {
 	ingredients, err := h.service.ListIngredients(c.Request.Context())
 	if err != nil {
+		log.Printf("Error listing ingredients: %v", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal mengambil ingredient"})
 		return
 	}
 	c.JSON(http.StatusOK, ingredients)
 }
 
-func (h *IngredientHandler) UpdateIngredient(c *gin.Context) {
+func (h *IngredientHandler) GetIngredientByID(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
+		log.Printf("ID tidak valid: %v", err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": "ID tidak valid"})
 		return
 	}
 
-	var req CreateIngredientRequest // Reuse struct
+	ingredient, err := h.service.GetIngredientByID(c.Request.Context(), id)
+	if err != nil {
+		log.Printf("Gagal mengambil ingredient ID %d: %v", id, err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal mengambil data ingredient"})
+		return
+	}
+
+	c.JSON(http.StatusOK, ingredient)
+}
+
+func (h *IngredientHandler) UpdateIngredient(c *gin.Context) {
+	idStr := c.Param("id")
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		log.Printf("ID tidak valid untuk update: %v", err)
+		c.JSON(http.StatusBadRequest, gin.H{"error": "ID tidak valid"})
+		return
+	}
+
+	var req CreateIngredientRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
+		log.Printf("Error binding update request: %v", err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
@@ -78,12 +104,14 @@ func (h *IngredientHandler) UpdateIngredient(c *gin.Context) {
 		ID:          id,
 		Name:        req.Name,
 		Qty:         req.Qty,
+		Unit:        req.Unit,
 		IsAllergen:  req.IsAllergen,
 		IsActive:    req.IsActive,
 		Description: sql.NullString{String: req.Description, Valid: req.Description != ""},
 	}
 
 	if err := h.service.UpdateIngredient(c.Request.Context(), ingredient); err != nil {
+		log.Printf("Gagal update ingredient ID %d: %v", id, err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal mengupdate ingredient"})
 		return
 	}
@@ -95,14 +123,14 @@ func (h *IngredientHandler) DeleteIngredient(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
-		log.Printf("ID ingredient tidak valid: %v", err)
+		log.Printf("ID ingredient tidak valid untuk delete: %v", err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": "ID tidak valid"})
 		return
 	}
 
 	err = h.service.DeleteIngredient(c.Request.Context(), id)
 	if err != nil {
-		log.Printf("Gagal menghapus ingredient: %v", err)
+		log.Printf("Gagal menghapus (soft delete) ingredient ID %d: %v", id, err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal menghapus ingredient"})
 		return
 	}
