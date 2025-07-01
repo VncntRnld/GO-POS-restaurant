@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"database/sql"
 	"log"
 	"net/http"
 	"pos-restaurant/models"
@@ -18,20 +19,37 @@ func NewTableHandler(service *services.TableService) *TableHandler {
 	return &TableHandler{service: service}
 }
 
+type newTableRequest struct {
+	OutletID     int    `json:"outlet_id"`
+	TableNumber  string `json:"table_number"`
+	Capacity     int    `json:"capacity"`
+	LocationType string `json:"location_type"`
+	Status       string `json:"status"`
+}
+
 func (h *TableHandler) Create(c *gin.Context) {
-	var req models.Table
+	var req newTableRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		log.Println("Invalid request:", err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	id, err := h.service.CreateTable(c.Request.Context(), &req)
+
+	table := &models.Table{
+		OutletID:     req.OutletID,
+		TableNumber:  req.TableNumber,
+		Capacity:     req.Capacity,
+		LocationType: sql.NullString{String: req.LocationType, Valid: req.LocationType != ""},
+		Status:       req.Status,
+	}
+
+	id, err := h.service.CreateTable(c.Request.Context(), table)
 	if err != nil {
 		log.Println("Failed to create table:", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal membuat meja"})
 		return
 	}
-	c.JSON(http.StatusCreated, gin.H{"id": id})
+	c.JSON(http.StatusCreated, gin.H{"id": id, "message": "Table berhasil ditambahkan"})
 }
 
 func (h *TableHandler) List(c *gin.Context) {
@@ -67,14 +85,23 @@ func (h *TableHandler) Update(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "ID tidak valid"})
 		return
 	}
-	var req models.Table
+	var req newTableRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		log.Println("Invalid update payload:", err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	req.ID = id
-	if err := h.service.UpdateTable(c.Request.Context(), &req); err != nil {
+
+	table := &models.Table{
+		ID:           id,
+		OutletID:     req.OutletID,
+		TableNumber:  req.TableNumber,
+		Capacity:     req.Capacity,
+		LocationType: sql.NullString{String: req.LocationType, Valid: req.LocationType != ""},
+		Status:       req.Status,
+	}
+
+	if err := h.service.UpdateTable(c.Request.Context(), table); err != nil {
 		log.Println("Failed to update table:", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal update meja"})
 		return

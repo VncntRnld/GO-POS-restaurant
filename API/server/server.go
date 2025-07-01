@@ -15,6 +15,10 @@ func NewServer(
 	outletHandler *handlers.OutletHandler,
 	tableHandler *handlers.TableHandler,
 	staffHandler *handlers.StaffHandler,
+
+	customerHandler *handlers.CustomerHandler,
+	visitHandler *handlers.CustomerVisitHandler,
+	reservationHandler *handlers.ReservationHandler,
 ) *gin.Engine {
 
 	r := gin.Default()
@@ -89,6 +93,33 @@ func NewServer(
 		staff.GET("/:id", staffHandler.GetByID)
 		staff.PUT("/:id", staffHandler.Update)
 		staff.DELETE("/:id", staffHandler.SoftDelete)
+	}
+
+	customer := api.Group("/customers")
+	{
+		customer.POST("/", customerHandler.Create)
+		customer.GET("/", customerHandler.List)
+		customer.GET("/:id", customerHandler.GetByID)
+		customer.PUT("/:id", customerHandler.Update)
+		customer.DELETE("/:id", customerHandler.SoftDelete)
+	}
+
+	visits := api.Group("/visits")
+	{
+		visits.POST("/", visitHandler.Create)
+		visits.GET("/", visitHandler.List)
+		visits.GET("/:id", visitHandler.GetByID)
+		visits.PUT("/:id", visitHandler.Update)
+		visits.DELETE("/:id", visitHandler.Delete)
+	}
+
+	group := api.Group("/reservations")
+	{
+		group.POST("/", reservationHandler.Create)
+		group.GET("/", reservationHandler.List)
+		group.GET("/:id", reservationHandler.GetByID)
+		group.PUT("/:id", reservationHandler.Update)
+		group.DELETE("/:id", reservationHandler.Delete)
 	}
 
 	return r

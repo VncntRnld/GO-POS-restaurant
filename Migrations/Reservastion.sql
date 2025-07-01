@@ -3,9 +3,9 @@ CREATE TYPE customer_type AS ENUM ('hotel_guest', 'non-guest');
 CREATE TABLE customers (
     cust_id SERIAL PRIMARY KEY, -- Perlu ditambahin HYBRID sama UUID kah?
     hotel_guest_id VARCHAR(50) NULL, -- ID akan dikoneksikan dengan sistem hotel
-    tipe customer_type NOT NULL,
+    type customer_type NOT NULL,
 
-    nama VARCHAR(255) NOT NULL,
+    name VARCHAR(255) NOT NULL,
     phone VARCHAR(50),
     visit_count INT DEFAULT 0,
     last_visit TIMESTAMP,
@@ -15,24 +15,6 @@ CREATE TABLE customers (
 
 
 -- Restaurant
-CREATE TYPE visit_type AS ENUM ('breakfast', 'lunch', 'dinner', 'event');
-CREATE TABLE customer_visits (
-    id SERIAL PRIMARY KEY,
-    customer_id INT REFERENCES customers(cust_id),
-    visit_type visit_type NOT NULL,
-    visit_date TIMESTAMP NOT NULL,
-    
-    room_number VARCHAR(20), -- Jika tamu hotel
-    reservation_id INT NULL, -- FK ke tabel reservations
-    outlet_id INT REFERENCES outlets(id), -- Untuk tracking outlet restoran
-
-    total_spent DECIMAL(12,2),
-    pax INT, -- Jumlah orang
-    -- pax_children INT, -- jumlah anak-anak
-
-    created_at TIMESTAMP DEFAULT NOW()
-);
-
 CREATE TYPE status_reservation AS ENUM ('confirmed', 'waiting', 'canceled', 'no_show', 'seated');
 CREATE TABLE reservations (
     id SERIAL PRIMARY KEY,
@@ -45,6 +27,25 @@ CREATE TABLE reservations (
     status status_reservation NOT NULL,
     special_request TEXT,
     
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE TYPE visit_type AS ENUM ('breakfast', 'lunch', 'dinner', 'event');
+CREATE TABLE customer_visits (
+    id SERIAL PRIMARY KEY,
+    customer_id INT REFERENCES customers(cust_id),
+    visit_type visit_type NOT NULL,
+    visit_date TIMESTAMP NOT NULL,
+    
+    room_number VARCHAR(20), -- Jika tamu hotel
+    reservation_id INT REFERENCES reservations(id) NULL, -- FK ke tabel reservations
+    outlet_id INT REFERENCES outlets(id), -- Untuk tracking outlet restoran
+
+    total_spent DECIMAL(12,2),
+    pax INT, -- Jumlah orang
+    -- pax_children INT, -- jumlah anak-anak
+
     created_at TIMESTAMP DEFAULT NOW(),
     updated_at TIMESTAMP DEFAULT NOW()
 );
@@ -105,4 +106,25 @@ CREATE TABLE table_transfers (
     transferred_by INT REFERENCES staff(id),
     transferred_at TIMESTAMP DEFAULT NOW(),
     reason TEXT
+);
+
+CREATE TABLE order_items (
+    id SERIAL PRIMARY KEY,
+    order_id INT NOT NULL REFERENCES orders(id) ON DELETE CASCADE,
+    menu_item_id INT NOT NULL REFERENCES menu_items(id),
+    quantity INT NOT NULL CHECK (quantity > 0),
+    unit_price DECIMAL(10,2) NOT NULL,  -- Harga saat dipesan (snapshot)
+    discount_amount DECIMAL(10,2) DEFAULT 0,
+    notes TEXT,  -- Contoh: "Pedas level 3, no bawang"
+    chef_notes TEXT,  -- Catatan khusus untuk dapur
+    prepared_by INT NULL REFERENCES staff(id),  -- Staff yang menyiapkan
+    created_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE TABLE order_item_ingredients_excluded (
+    id SERIAL PRIMARY KEY,
+    order_item_id INT NOT NULL REFERENCES order_items(id) ON DELETE CASCADE,
+    ingredient_id INT NOT NULL REFERENCES ingredients(id),
+    notes TEXT,  -- Contoh: "Alergi kacang"
+    created_at TIMESTAMP DEFAULT NOW()
 );

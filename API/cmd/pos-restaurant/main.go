@@ -27,6 +27,10 @@ func main() {
 	tableRepo := repositories.NewTableRepository(database.DB)
 	staffRepo := repositories.NewStaffRepository(database.DB)
 
+	customerRepo := repositories.NewCustomerRepository(database.DB)
+	customerVisitRepo := repositories.NewCustomerVisitRepository(database.DB)
+	reservationRepo := repositories.NewReservationRepository(database.DB)
+
 	// Service Init
 	menuService := services.NewMenuService(menuRepo)
 	categoryService := services.NewMenuCategoryService(categoryRepo)
@@ -36,6 +40,10 @@ func main() {
 	outletService := services.NewOutletService(outletRepo)
 	tableService := services.NewTableService(tableRepo)
 	staffService := services.NewStaffService(staffRepo)
+
+	customerService := services.NewCustomerService(customerRepo)
+	customerVisitService := services.NewCustomerVisitService(customerVisitRepo)
+	reservationService := services.NewReservationService(reservationRepo)
 
 	// Handler init
 	menuHandler := handlers.NewMenuItemHandler(menuService)
@@ -47,6 +55,10 @@ func main() {
 	tableHandler := handlers.NewTableHandler(tableService)
 	staffHandler := handlers.NewStaffHandler(staffService)
 
+	customerHandler := handlers.NewCustomerHandler(customerService)
+	customerVisitHandler := handlers.NewCustomerVisitHandler(customerVisitService)
+	reservationHandler := handlers.NewReservationHandler(reservationService)
+
 	// Create and Start server
 	srv := server.NewServer(
 		menuHandler,
@@ -57,7 +69,12 @@ func main() {
 		outletHandler,
 		tableHandler,
 		staffHandler,
+
+		customerHandler,
+		customerVisitHandler,
+		reservationHandler,
 	)
+
 	log.Printf("Server starting on port 8080")
 	if err := srv.Run(":8080"); err != nil {
 		log.Fatalf("Server failed: %v", err)

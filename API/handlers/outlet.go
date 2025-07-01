@@ -49,7 +49,7 @@ func (h *OutletHandler) Create(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal membuat outlet"})
 		return
 	}
-	c.JSON(http.StatusCreated, gin.H{"id": id})
+	c.JSON(http.StatusCreated, gin.H{"id": id, "message": "Outlet berhasil ditambahkan"})
 }
 
 func (h *OutletHandler) List(c *gin.Context) {

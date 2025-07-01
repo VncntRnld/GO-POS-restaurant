@@ -9,8 +9,8 @@ import (
 type Customer struct {
 	CustID       int            `json:"cust_id"`
 	HotelGuestID sql.NullString `json:"hotel_guest_id"`
-	Tipe         string         `json:"tipe"`
-	Nama         string         `json:"nama"`
+	Type         string         `json:"type"`
+	Name         string         `json:"name"`
 	Phone        sql.NullString `json:"phone"`
 	VisitCount   int            `json:"visit_count"`
 	LastVisit    sql.NullTime   `json:"last_visit"`
@@ -30,4 +30,5 @@ type CustomerVisit struct {
 	TotalSpent    sql.NullFloat64 `json:"total_spent"`
 	Pax           int             `json:"pax"`
 	CreatedAt     time.Time       `json:"created_at"`
+	UpdatedAt     time.Time       `json:"updated_at"`
 }
