@@ -112,19 +112,15 @@ CREATE TABLE order_items (
     id SERIAL PRIMARY KEY,
     order_id INT NOT NULL REFERENCES orders(id) ON DELETE CASCADE,
     menu_item_id INT NOT NULL REFERENCES menu_items(id),
-    quantity INT NOT NULL CHECK (quantity > 0),
+    qty DECIMAL(6,2) NOT NULL CHECK (qty > 0),
     unit_price DECIMAL(10,2) NOT NULL,  -- Harga saat dipesan (snapshot)
-    discount_amount DECIMAL(10,2) DEFAULT 0,
     notes TEXT,  -- Contoh: "Pedas level 3, no bawang"
-    chef_notes TEXT,  -- Catatan khusus untuk dapur
-    prepared_by INT NULL REFERENCES staff(id),  -- Staff yang menyiapkan
     created_at TIMESTAMP DEFAULT NOW()
 );
 
-CREATE TABLE order_item_ingredients_excluded (
+CREATE TABLE order_item_ingredient_excluded (
     id SERIAL PRIMARY KEY,
     order_item_id INT NOT NULL REFERENCES order_items(id) ON DELETE CASCADE,
     ingredient_id INT NOT NULL REFERENCES ingredients(id),
-    notes TEXT,  -- Contoh: "Alergi kacang"
     created_at TIMESTAMP DEFAULT NOW()
 );

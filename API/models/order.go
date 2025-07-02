@@ -20,6 +20,28 @@ type Order struct {
 	UpdatedAt   time.Time      `json:"updated_at"`
 }
 
+type OrderRequest struct {
+	ID          int              `json:"id"`
+	OrderNumber string           `json:"order_number"`
+	TableID     int              `json:"table_id"`
+	CustomerID  int              `json:"customer_id"`
+	HotelRoom   sql.NullString   `json:"hotel_room"`
+	WaiterID    int              `json:"waiter_id"`
+	OutletID    int              `json:"outlet_id"`
+	Status      string           `json:"status"`
+	OrderType   string           `json:"order_type"`
+	Items       []OrderItemInput `json:"items"`
+}
+
+type OrderItemInput struct {
+	ID                    int     `json:"id"`
+	MenuItemID            int     `json:"menu_item_id"`
+	Qty                   float64 `json:"qty"`
+	Notes                 string  `json:"notes,omitempty"`
+	UnitPrice             float64 `json:"unit_price"` // captured per item
+	ExcludedIngredientIDs []int   `json:"excluded_ingredients"`
+}
+
 // Bills
 type Bill struct {
 	ID             int           `json:"id"`

@@ -49,7 +49,7 @@ CREATE TABLE menu_categories (
 CREATE TABLE ingredients (
     id SERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL UNIQUE,
-    quantity DECIMAL(6,2) NOT NULL,    -- Jumlah bahan (e.g. 100 gram)
+    qty DECIMAL(6,2) NOT NULL,    -- Jumlah bahan (e.g. 100 gram)
     unit VARCHAR(20) NOT NULL,          -- Satuan (gram, ml, pcs)
     is_allergen BOOLEAN DEFAULT FALSE,  -- Bahan penyebab alergi umum
     is_active BOOLEAN DEFAULT TRUE,      -- Untuk toggle on/off
