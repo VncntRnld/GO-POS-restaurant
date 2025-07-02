@@ -28,6 +28,22 @@ func (r *CustomerVisitRepository) Create(ctx context.Context, visit *models.Cust
 		visit.TotalSpent, visit.Pax,
 	).Scan(&id)
 
+	if err != nil {
+		return 0, err
+	}
+
+	// Update visit_count (increment by 1)
+	_, err = r.db.ExecContext(ctx, `
+		UPDATE customers
+		SET visit_count = COALESCE(visit_count, 0) + 1, updated_at = NOW()
+		WHERE cust_id = $1
+	`,
+		visit.CustomerID,
+	)
+	if err != nil {
+		return id, err // return ID tetap karena insert sudah berhasil
+	}
+
 	return id, err
 }
 
