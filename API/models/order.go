@@ -42,6 +42,14 @@ type OrderItemInput struct {
 	ExcludedIngredientIDs []int   `json:"excluded_ingredients"`
 }
 
+type AddOrderItemRequest struct {
+	MenuItemID            int     `json:"menu_item_id" binding:"required"`
+	Qty                   float64 `json:"qty" binding:"required"`
+	Notes                 string  `json:"notes,omitempty"`
+	UnitPrice             float64 `json:"unit_price"` // captured per item
+	ExcludedIngredientIDs []int   `json:"excluded_ingredient_ids"`
+}
+
 // Bills
 type Bill struct {
 	ID             int           `json:"id"`

@@ -131,6 +131,7 @@ func NewServer(
 		orders.GET("/", orderHandler.List)
 		orders.GET("/:id", orderHandler.GetByID)
 		orders.PUT("/:id", orderHandler.Update)
+		orders.POST("/:id/add", orderHandler.AddItem)
 		orders.DELETE("/:id", orderHandler.Delete)
 	}
 

@@ -29,9 +29,12 @@ func (s *OrderService) GetByID(ctx context.Context, id int) (*models.OrderReques
 	return s.repo.GetByID(ctx, id)
 }
 
-// Belum
 func (s *OrderService) Update(ctx context.Context, order *models.Order) error {
 	return s.repo.Update(ctx, order)
+}
+
+func (s *OrderService) AddItem(ctx context.Context, orderID int, item *models.AddOrderItemRequest) error {
+	return s.repo.AddItem(ctx, orderID, item)
 }
 
 func (s *OrderService) SoftDelete(ctx context.Context, id int) error {
