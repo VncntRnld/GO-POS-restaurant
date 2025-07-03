@@ -28,7 +28,7 @@ type NewOrderRequest struct {
 	OutletID   int                     `json:"outlet_id"`
 	Status     string                  `json:"status"`
 	OrderType  string                  `json:"order_type"`
-	Items      []models.OrderItemInput `json:items`
+	Items      []models.OrderItemInput `json:"items"`
 }
 
 func (h *OrderHandler) Create(c *gin.Context) {
