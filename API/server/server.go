@@ -21,6 +21,7 @@ func NewServer(
 	reservationHandler *handlers.ReservationHandler,
 
 	orderHandler *handlers.OrderHandler,
+	billHandler *handlers.BillHandler,
 ) *gin.Engine {
 
 	r := gin.Default()
@@ -133,6 +134,15 @@ func NewServer(
 		orders.PUT("/:id", orderHandler.Update)
 		orders.POST("/:id/add", orderHandler.AddItem)
 		orders.DELETE("/:id", orderHandler.Delete)
+	}
+
+	// Bill
+	bills := api.Group("/bills")
+	{
+		bills.POST("/", billHandler.Create)
+		bills.POST("/split", billHandler.CreateSplit)
+		bills.GET("/:id", billHandler.GetByID)
+		bills.POST("/pay", billHandler.Pay)
 	}
 
 	return r

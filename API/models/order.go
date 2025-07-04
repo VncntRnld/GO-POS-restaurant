@@ -68,6 +68,17 @@ type Bill struct {
 	UpdatedAt      time.Time     `json:"updated_at"`
 }
 
+type SplitBillRequest struct {
+	OriginalOrderID int              `json:"original_order_id"`
+	OriginalBillID  int              `json:"original_bill_id"` // <- Tambahan
+	Splits          []SplitBillInput `json:"splits"`
+}
+
+type SplitBillInput struct {
+	ItemIDs        []int   `json:"item_ids"`
+	DiscountAmount float64 `json:"discount_amount"`
+}
+
 // Bill Payments
 type BillPayment struct {
 	ID                   int            `json:"id"`

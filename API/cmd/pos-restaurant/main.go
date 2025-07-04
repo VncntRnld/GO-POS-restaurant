@@ -32,6 +32,7 @@ func main() {
 	reservationRepo := repositories.NewReservationRepository(database.DB)
 
 	orderRepo := repositories.NewOrderRepository(database.DB)
+	billRepo := repositories.NewBillRepository(database.DB)
 
 	// Service Init
 	menuService := services.NewMenuService(menuRepo)
@@ -48,6 +49,7 @@ func main() {
 	reservationService := services.NewReservationService(reservationRepo)
 
 	OrderService := services.NewOrderService(orderRepo)
+	billService := services.NewBillService(billRepo)
 
 	// Handler init
 	menuHandler := handlers.NewMenuItemHandler(menuService)
@@ -64,6 +66,7 @@ func main() {
 	reservationHandler := handlers.NewReservationHandler(reservationService)
 
 	orderHandler := handlers.NewOrderHandler(OrderService)
+	billHandler := handlers.NewBillHandler(billService)
 
 	// Create and Start server
 	srv := server.NewServer(
@@ -81,6 +84,7 @@ func main() {
 		reservationHandler,
 
 		orderHandler,
+		billHandler,
 	)
 
 	log.Printf("Server starting on port 8080")
