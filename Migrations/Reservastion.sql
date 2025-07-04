@@ -67,7 +67,7 @@ CREATE TABLE orders (
     updated_at TIMESTAMP DEFAULT NOW()
 );
 
-CREATE TYPE status_bill AS ENUM ('open', 'paid', 'partial', 'void');
+CREATE TYPE status_bill AS ENUM ('open', 'paid', 'partial', 'split', 'void');
 CREATE TABLE bills (
     id SERIAL PRIMARY KEY,
     bill_number VARCHAR(50) UNIQUE NOT NULL, --UUID

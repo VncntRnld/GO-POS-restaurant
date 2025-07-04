@@ -33,8 +33,16 @@ func (s *BillService) CreateSplit(ctx context.Context, req models.SplitBillReque
 	return s.repo.CreateSplit(ctx, req)
 }
 
+func (s *BillService) List(ctx context.Context) ([]*models.Bill, error) {
+	return s.repo.List(ctx)
+}
+
 func (s *BillService) GetByID(ctx context.Context, id int) (*models.Bill, error) {
 	return s.repo.GetByID(ctx, id)
+}
+
+func (s *BillService) SoftDelete(ctx context.Context, id int) error {
+	return s.repo.SoftDelete(ctx, id)
 }
 
 func (s *BillService) Pay(ctx context.Context, payment *models.BillPayment) error {

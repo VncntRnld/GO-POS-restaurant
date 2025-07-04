@@ -141,7 +141,10 @@ func NewServer(
 	{
 		bills.POST("/", billHandler.Create)
 		bills.POST("/split", billHandler.CreateSplit)
+		bills.GET("/", billHandler.List)
 		bills.GET("/:id", billHandler.GetByID)
+		bills.DELETE("/:id", billHandler.Delete)
+
 		bills.POST("/pay", billHandler.Pay)
 	}
 

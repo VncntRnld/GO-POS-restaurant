@@ -137,16 +137,6 @@ func (r *BillRepository) CreateSplit(ctx context.Context, req models.SplitBillRe
 		svcAmount := subtotal * svcPercent / 100
 		total := subtotal + taxAmount + svcAmount - split.DiscountAmount
 
-		// var paidStatus string
-		// switch {
-		// case balance <= 0:
-		// 	paidStatus = "paid"
-		// case split.PaidAmount == 0:
-		// 	paidStatus = "unpaid"
-		// default:
-		// 	paidStatus = "partial"
-		// }
-
 		var billID int
 		billNumber := uuid.New().String()
 		err = tx.QueryRowContext(ctx, `
@@ -172,11 +162,60 @@ func (r *BillRepository) CreateSplit(ctx context.Context, req models.SplitBillRe
 		billIDs = append(billIDs, billID)
 	}
 
+	// ✅ Tambahan: update status bill utama menjadi 'split'
+	if req.OriginalBillID > 0 {
+		_, err = tx.ExecContext(ctx, `
+			UPDATE bills SET status = 'split', updated_at = NOW()
+			WHERE id = $1
+		`, req.OriginalBillID)
+		if err != nil {
+			return nil, fmt.Errorf("gagal mengubah status bill utama menjadi split: %w", err)
+		}
+	}
+
 	if err := tx.Commit(); err != nil {
 		return nil, err
 	}
 
 	return billIDs, nil
+}
+
+// repositories/bill_repository.go
+func (r *BillRepository) List(ctx context.Context) ([]*models.Bill, error) {
+	rows, err := r.db.QueryContext(ctx, `
+		SELECT 
+			id, bill_number, order_id, original_bill_id, status,
+			subtotal, tax_amount, service_charge, discount_amount,
+			total_amount, paid_amount, balance_due,
+			created_at, updated_at
+		FROM bills
+		ORDER BY created_at DESC
+	`)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var bills []*models.Bill
+	for rows.Next() {
+		var bill models.Bill
+		var originalBillID sql.NullInt64
+
+		err := rows.Scan(
+			&bill.ID, &bill.BillNumber, &bill.OrderID, &originalBillID, &bill.Status,
+			&bill.Subtotal, &bill.TaxAmount, &bill.ServiceCharge, &bill.DiscountAmount,
+			&bill.TotalAmount, &bill.PaidAmount, &bill.BalanceDue,
+			&bill.CreatedAt, &bill.UpdatedAt,
+		)
+		if err != nil {
+			return nil, err
+		}
+
+		bill.OriginalBillID = originalBillID
+		bills = append(bills, &bill)
+	}
+
+	return bills, nil
 }
 
 func (r *BillRepository) GetByID(ctx context.Context, id int) (*models.Bill, error) {
@@ -216,6 +255,14 @@ func (r *BillRepository) GetByID(ctx context.Context, id int) (*models.Bill, err
 	}
 
 	return &bill, nil
+}
+
+func (r *BillRepository) SoftDelete(ctx context.Context, id int) error {
+	_, err := r.db.ExecContext(ctx, `
+		UPDATE bills SET status = 'void', updated_at = NOW()
+		WHERE id = $1
+	`, id)
+	return err
 }
 
 func (r *BillRepository) Pay(ctx context.Context, payment *models.BillPayment) error {

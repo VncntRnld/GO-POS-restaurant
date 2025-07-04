@@ -60,6 +60,17 @@ func (h *BillHandler) CreateSplit(c *gin.Context) {
 	c.JSON(http.StatusCreated, gin.H{"message": "Split bill berhasil dibuat", "bill_ids": billIDs})
 }
 
+func (h *BillHandler) List(c *gin.Context) {
+	bills, err := h.service.List(c.Request.Context())
+	if err != nil {
+		log.Printf("Gagal mengambil daftar tagihan: %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal mengambil daftar tagihan"})
+		return
+	}
+
+	c.JSON(http.StatusOK, bills)
+}
+
 func (h *BillHandler) GetByID(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
@@ -81,6 +92,15 @@ func (h *BillHandler) GetByID(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, bill)
+}
+
+func (h *BillHandler) Delete(c *gin.Context) {
+	id, _ := strconv.Atoi(c.Param("id"))
+	if err := h.service.SoftDelete(c.Request.Context(), id); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete bill"})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"message": "Bill deleted"})
 }
 
 type BillPaymentRequest struct {
