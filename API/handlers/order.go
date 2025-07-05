@@ -34,7 +34,7 @@ type NewOrderRequest struct {
 func (h *OrderHandler) Create(c *gin.Context) {
 	var req NewOrderRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		log.Printf("Bind error: %v", err)
+		log.Printf("Bind JSON error (Create Order): %v", err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
@@ -52,17 +52,18 @@ func (h *OrderHandler) Create(c *gin.Context) {
 
 	id, err := h.service.Create(c.Request.Context(), order)
 	if err != nil {
-		log.Printf("Create order error: %v", err)
+		log.Printf("Create Order error: %v", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal membuat order"})
 		return
 	}
+
 	c.JSON(http.StatusCreated, gin.H{"id": id})
 }
 
 func (h *OrderHandler) List(c *gin.Context) {
 	orders, err := h.service.List(c.Request.Context())
 	if err != nil {
-		log.Printf("Get data error: %v", err)
+		log.Printf("List Orders error: %v", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get orders"})
 		return
 	}
@@ -70,19 +71,34 @@ func (h *OrderHandler) List(c *gin.Context) {
 }
 
 func (h *OrderHandler) GetByID(c *gin.Context) {
-	id, _ := strconv.Atoi(c.Param("id"))
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		log.Printf("Invalid ID (GetByID): %v", err)
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID"})
+		return
+	}
+
 	order, err := h.service.GetByID(c.Request.Context(), id)
 	if err != nil {
+		log.Printf("Order not found (ID %d): %v", id, err)
 		c.JSON(http.StatusNotFound, gin.H{"error": "Order not found"})
 		return
 	}
+
 	c.JSON(http.StatusOK, order)
 }
 
 func (h *OrderHandler) Update(c *gin.Context) {
-	id, _ := strconv.Atoi(c.Param("id"))
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		log.Printf("Invalid ID (Update): %v", err)
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID"})
+		return
+	}
+
 	var req NewOrderRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
+		log.Printf("Bind JSON error (Update Order): %v", err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
@@ -100,29 +116,31 @@ func (h *OrderHandler) Update(c *gin.Context) {
 	}
 
 	if err := h.service.Update(c.Request.Context(), order); err != nil {
+		log.Printf("Update Order error (ID %d): %v", id, err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update order"})
 		return
 	}
+
 	c.JSON(http.StatusOK, gin.H{"message": "Order updated"})
 }
 
 func (h *OrderHandler) AddItem(c *gin.Context) {
 	orderID, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		log.Printf("Invalid order ID: %v", err)
+		log.Printf("Invalid Order ID (AddItem): %v", err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid order ID"})
 		return
 	}
 
 	var req models.AddOrderItemRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		log.Printf("Invalid body: %v", err)
+		log.Printf("Bind JSON error (AddItem): %v", err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
 	if err := h.service.AddItem(c.Request.Context(), orderID, &req); err != nil {
-		log.Printf("Gagal menambahkan item ke order %d: %v", orderID, err)
+		log.Printf("Add Item to Order error (Order ID %d): %v", orderID, err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal menambahkan item"})
 		return
 	}
@@ -131,10 +149,18 @@ func (h *OrderHandler) AddItem(c *gin.Context) {
 }
 
 func (h *OrderHandler) Delete(c *gin.Context) {
-	id, _ := strconv.Atoi(c.Param("id"))
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		log.Printf("Invalid ID (Delete): %v", err)
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID"})
+		return
+	}
+
 	if err := h.service.SoftDelete(c.Request.Context(), id); err != nil {
+		log.Printf("Delete Order error (ID %d): %v", id, err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete order"})
 		return
 	}
+
 	c.JSON(http.StatusOK, gin.H{"message": "Order deleted"})
 }

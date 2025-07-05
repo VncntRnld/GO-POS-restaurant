@@ -92,15 +92,15 @@ CREATE TABLE menu_ingredients (
     updated_at TIMESTAMP DEFAULT NOW()
 );
 
-CREATE TABLE sales_analysis_daily (
-    id SERIAL PRIMARY KEY,
-    outlet_id INT REFERENCES outlets(id),
-    analysis_date DATE NOT NULL,
-    total_sales DECIMAL(12,2) NOT NULL,
-    total_covers INT NOT NULL, -- Jumlah tamu
-    avg_spend_per_cover DECIMAL(10,2) NOT NULL,
-    discount_amount DECIMAL(12,2) NOT NULL,
-    void_amount DECIMAL(12,2) NOT NULL, -- Total transaksi batal
-    created_at TIMESTAMP DEFAULT NOW(),
-    UNIQUE(outlet_id, analysis_date)
-);
+-- CREATE TABLE sales_analysis_daily (
+--     id SERIAL PRIMARY KEY,
+--     outlet_id INT REFERENCES outlets(id),
+--     analysis_date DATE NOT NULL,
+--     total_sales DECIMAL(12,2) NOT NULL,
+--     total_covers INT NOT NULL, -- Jumlah tamu
+--     avg_spend_per_cover DECIMAL(10,2) NOT NULL,
+--     discount_amount DECIMAL(12,2) NOT NULL,
+--     void_amount DECIMAL(12,2) NOT NULL, -- Total transaksi batal
+--     created_at TIMESTAMP DEFAULT NOW(),
+--     UNIQUE(outlet_id, analysis_date)
+-- );
