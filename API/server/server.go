@@ -22,6 +22,7 @@ func NewServer(
 
 	orderHandler *handlers.OrderHandler,
 	billHandler *handlers.BillHandler,
+	tableTransferHandler *handlers.TableTransferHandler,
 ) *gin.Engine {
 
 	r := gin.Default()
@@ -146,6 +147,15 @@ func NewServer(
 		bills.DELETE("/:id", billHandler.Delete)
 
 		bills.POST("/pay", billHandler.Pay)
+	}
+
+	tabletf := api.Group("/table-transfer")
+	{
+		tabletf.POST("/", tableTransferHandler.Create)
+		tabletf.GET("/", tableTransferHandler.List)
+		tabletf.GET("/:id", tableTransferHandler.GetByID)
+		tabletf.PUT("/:id", tableTransferHandler.Update)
+		tabletf.DELETE("/:id", tableTransferHandler.Delete)
 	}
 
 	return r
