@@ -49,3 +49,6 @@ Ini adalah proyek backend sederhana untuk sistem **Point of Sale (POS) restoran*
 ```bash
 git clone https://github.com/username/pos-restaurant-go.git
 cd pos-restaurant-go
+
+Edit API/database/db-template.go
+Rename to db.go
