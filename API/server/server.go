@@ -4,6 +4,11 @@ import (
 	"pos-restaurant/handlers"
 
 	"github.com/gin-gonic/gin"
+
+	_ "pos-restaurant/cmd/pos-restaurant/docs"
+
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 func NewServer(
@@ -27,6 +32,8 @@ func NewServer(
 
 	r := gin.Default()
 	api := r.Group("/api")
+
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	// Menu-items Routes
 	menu := api.Group("/menu")

@@ -22,6 +22,16 @@ type CreateCategoryRequest struct {
 	Name string `json:"name" binding:"required"`
 }
 
+// CreateCategory godoc
+// @Summary Tambah kategori menu baru
+// @Tags Category
+// @Accept json
+// @Produce json
+// @Param request body CreateCategoryRequest true "Data kategori baru"
+// @Success 201 {object} map[string]interface{}
+// @Failure 400 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /menu/category [post]
 func (h *MenuCategoryHandler) CreateCategory(c *gin.Context) {
 	var req CreateCategoryRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -39,6 +49,13 @@ func (h *MenuCategoryHandler) CreateCategory(c *gin.Context) {
 	c.JSON(http.StatusCreated, gin.H{"id": id, "name": category.Name})
 }
 
+// ListCategories godoc
+// @Summary Tampilkan semua kategori menu
+// @Tags Category
+// @Produce json
+// @Success 200 {array} models.MenuCategory
+// @Failure 500 {object} map[string]string
+// @Router /menu/category [get]
 func (h *MenuCategoryHandler) ListCategories(c *gin.Context) {
 	categories, err := h.service.ListCategories(c.Request.Context())
 	if err != nil {
@@ -48,6 +65,15 @@ func (h *MenuCategoryHandler) ListCategories(c *gin.Context) {
 	c.JSON(http.StatusOK, categories)
 }
 
+// DeleteCategory godoc
+// @Summary Hapus (soft delete) kategori menu
+// @Tags Category
+// @Produce json
+// @Param id path int true "ID Kategori"
+// @Success 200 {object} map[string]string
+// @Failure 400 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /menu/category/{id} [delete]
 func (h *MenuCategoryHandler) DeleteCategory(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)

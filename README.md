@@ -42,6 +42,12 @@ Ini adalah proyek backend sederhana untuk sistem **Point of Sale (POS) restoran*
 
 ---
 
+## Swaggo - Swagger UI
+```bash
+# To Save/update
+swag init --generalInfo cmd/pos-restaurant/main.go --output cmd/pos-restaurant/docs --parseDependency --parseInternal
+```
+
 ## 🚀 Cara Menjalankan
 
 ### 1. Clone Repository
@@ -49,6 +55,6 @@ Ini adalah proyek backend sederhana untuk sistem **Point of Sale (POS) restoran*
 ```bash
 git clone https://github.com/username/pos-restaurant-go.git
 cd pos-restaurant-go
-
-Edit API/database/db-template.go
-Rename to db.go
+```
+### 3. Edit API/database/db-template.go
+### 4. Rename to db.go

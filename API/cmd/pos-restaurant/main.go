@@ -1,3 +1,12 @@
+// @title POS Restaurant API
+// @version 1.0
+// @description Dokumentasi API untuk sistem POS Restoran
+// @contact.name Vincent Ronald
+// @contact.email vincentronald9703@gmail.com
+// @host localhost:8080
+// @BasePath /api
+// @schemes http
+
 package main
 
 import (

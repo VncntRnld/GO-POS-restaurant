@@ -31,6 +31,16 @@ type CreateMenuItemRequest struct {
 	Tags            []string `json:"tags"`
 }
 
+// CreateMenuItem godoc
+// @Summary Tambah menu baru
+// @Tags Menu-Items
+// @Accept json
+// @Produce json
+// @Param request body CreateMenuItemRequest true "Data menu baru"
+// @Success 201 {object} map[string]interface{}
+// @Failure 400 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /menu/menu-items [post]
 func (h *MenuItemHandler) CreateMenuItem(c *gin.Context) {
 	var req CreateMenuItemRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -64,6 +74,15 @@ func (h *MenuItemHandler) CreateMenuItem(c *gin.Context) {
 	c.JSON(http.StatusCreated, gin.H{"id": id, "name": menuItem.Name})
 }
 
+// GetMenuItemsByCategory godoc
+// @Summary Dapatkan menu berdasarkan kategori
+// @Tags Menu
+// @Produce json
+// @Param category_id query int true "ID Kategori"
+// @Success 200 {array} models.MenuItem
+// @Failure 400 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /menu/menu-items/category [get]
 func (h *MenuItemHandler) GetMenuItemsByCategory(c *gin.Context) {
 	categoryIDStr := c.Query("category_id")
 	categoryID, err := strconv.Atoi(categoryIDStr)
@@ -83,6 +102,13 @@ func (h *MenuItemHandler) GetMenuItemsByCategory(c *gin.Context) {
 	c.JSON(http.StatusOK, items)
 }
 
+// ListMenuItems godoc
+// @Summary List semua menu
+// @Tags Menu
+// @Produce json
+// @Success 200 {array} models.MenuItem
+// @Failure 500 {object} map[string]string
+// @Router /menu/menu-items [get]
 func (h *MenuItemHandler) ListMenuItems(c *gin.Context) {
 	items, err := h.service.ListMenuItems(c.Request.Context())
 	if err != nil {
@@ -93,6 +119,13 @@ func (h *MenuItemHandler) ListMenuItems(c *gin.Context) {
 	c.JSON(http.StatusOK, items)
 }
 
+// ListActiveMenuItems godoc
+// @Summary List menu aktif
+// @Tags Menu
+// @Produce json
+// @Success 200 {array} models.MenuItem
+// @Failure 500 {object} map[string]string
+// @Router /menu/menu-items-active [get]
 func (h *MenuItemHandler) ListActiveMenuItems(c *gin.Context) {
 	items, err := h.service.ListActiveMenuItems(c.Request.Context())
 	if err != nil {
@@ -103,6 +136,15 @@ func (h *MenuItemHandler) ListActiveMenuItems(c *gin.Context) {
 	c.JSON(http.StatusOK, items)
 }
 
+// SearchMenuItems godoc
+// @Summary Cari menu berdasarkan keyword
+// @Tags Menu
+// @Produce json
+// @Param search query string true "Kata kunci pencarian"
+// @Success 200 {array} models.MenuItem
+// @Failure 400 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /menu/menu-items/search [get]
 func (h *MenuItemHandler) SearchMenuItems(c *gin.Context) {
 	keyword := c.Query("search")
 	if keyword == "" {
@@ -121,6 +163,17 @@ func (h *MenuItemHandler) SearchMenuItems(c *gin.Context) {
 	c.JSON(http.StatusOK, items)
 }
 
+// UpdateMenuItem godoc
+// @Summary Perbarui menu
+// @Tags Menu
+// @Accept json
+// @Produce json
+// @Param id path int true "ID Menu"
+// @Param request body CreateMenuItemRequest true "Data menu yang diperbarui"
+// @Success 200 {object} map[string]string
+// @Failure 400 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /menu/menu-items/{id} [put]
 func (h *MenuItemHandler) UpdateMenuItem(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
@@ -162,6 +215,15 @@ func (h *MenuItemHandler) UpdateMenuItem(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Menu item berhasil diupdate"})
 }
 
+// DeleteMenuItem godoc
+// @Summary Hapus (soft delete) menu
+// @Tags Menu
+// @Produce json
+// @Param id path int true "ID Menu"
+// @Success 200 {object} map[string]string
+// @Failure 400 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /menu/menu-items/{id} [delete]
 func (h *MenuItemHandler) DeleteMenuItem(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
@@ -180,7 +242,16 @@ func (h *MenuItemHandler) DeleteMenuItem(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Menu berhasil dihapus (soft delete)"})
 }
 
-// Get Details with multiple tables
+// GetMenuDetail godoc
+// @Summary Dapatkan detail menu dengan bahan
+// @Tags Menu
+// @Produce json
+// @Param id path int true "ID Menu"
+// @Success 200 {object} models.MenuItemWithIngredients
+// @Failure 400 {object} map[string]string
+// @Failure 404 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /menu/menu-items/detail/{id} [get]
 func (h *MenuItemHandler) GetMenuDetail(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)

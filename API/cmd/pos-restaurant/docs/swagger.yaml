@@ -1,0 +1,829 @@
+basePath: /api
+definitions:
+  handlers.CreateCategoryRequest:
+    properties:
+      name:
+        type: string
+    required:
+    - name
+    type: object
+  handlers.CreateIngredientRequest:
+    properties:
+      description:
+        type: string
+      is_active:
+        type: boolean
+      is_allergen:
+        type: boolean
+      name:
+        type: string
+      qty:
+        type: number
+      unit:
+        type: string
+    required:
+    - name
+    type: object
+  handlers.CreateMenuItemRequest:
+    properties:
+      category_id:
+        type: integer
+      cost:
+        minimum: 0
+        type: number
+      description:
+        type: string
+      is_active:
+        type: boolean
+      name:
+        maxLength: 255
+        type: string
+      preparation_time:
+        type: integer
+      price:
+        type: number
+      sku:
+        maxLength: 50
+        type: string
+      tags:
+        items:
+          type: string
+        type: array
+    required:
+    - category_id
+    - name
+    - price
+    - sku
+    type: object
+  handlers.newTableRequest:
+    properties:
+      capacity:
+        type: integer
+      location_type:
+        type: string
+      outlet_id:
+        type: integer
+      status:
+        type: string
+      table_number:
+        type: string
+    type: object
+  models.Ingredient:
+    properties:
+      created_at:
+        type: string
+      deleted_at:
+        $ref: '#/definitions/sql.NullTime'
+      description:
+        $ref: '#/definitions/sql.NullString'
+      id:
+        type: integer
+      is_active:
+        type: boolean
+      is_allergen:
+        type: boolean
+      name:
+        type: string
+      qty:
+        type: number
+      unit:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  models.MenuCategory:
+    properties:
+      created_at:
+        type: string
+      deleted_at:
+        $ref: '#/definitions/sql.NullTime'
+      id:
+        type: integer
+      name:
+        type: string
+    type: object
+  models.MenuItem:
+    properties:
+      category_id:
+        type: integer
+      cost:
+        type: number
+      created_at:
+        type: string
+      deleted_at:
+        $ref: '#/definitions/sql.NullTime'
+      description:
+        $ref: '#/definitions/sql.NullString'
+      id:
+        type: integer
+      is_active:
+        type: boolean
+      name:
+        type: string
+      preparation_time:
+        $ref: '#/definitions/sql.NullInt64'
+      price:
+        type: number
+      sku:
+        type: string
+      tags:
+        description: parsed manually from JSONB
+        items:
+          type: string
+        type: array
+      updated_at:
+        type: string
+    type: object
+  models.MenuItemWithIngredients:
+    properties:
+      category_id:
+        type: integer
+      cost:
+        type: number
+      created_at:
+        type: string
+      deleted_at:
+        $ref: '#/definitions/sql.NullTime'
+      description:
+        $ref: '#/definitions/sql.NullString'
+      id:
+        type: integer
+      ingredients:
+        items:
+          $ref: '#/definitions/models.Ingredient'
+        type: array
+      is_active:
+        type: boolean
+      name:
+        type: string
+      preparation_time:
+        $ref: '#/definitions/sql.NullInt64'
+      price:
+        type: number
+      sku:
+        type: string
+      tags:
+        description: parsed manually from JSONB
+        items:
+          type: string
+        type: array
+      updated_at:
+        type: string
+    type: object
+  models.Table:
+    properties:
+      capacity:
+        type: integer
+      created_at:
+        type: string
+      deleted_at:
+        $ref: '#/definitions/sql.NullTime'
+      id:
+        type: integer
+      location_type:
+        allOf:
+        - $ref: '#/definitions/sql.NullString'
+        description: '''Indoor'' or ''Outdoor'''
+      outlet_id:
+        type: integer
+      status:
+        description: available, occupied, etc.
+        type: string
+      table_number:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  sql.NullInt64:
+    properties:
+      int64:
+        type: integer
+      valid:
+        description: Valid is true if Int64 is not NULL
+        type: boolean
+    type: object
+  sql.NullString:
+    properties:
+      string:
+        type: string
+      valid:
+        description: Valid is true if String is not NULL
+        type: boolean
+    type: object
+  sql.NullTime:
+    properties:
+      time:
+        type: string
+      valid:
+        description: Valid is true if Time is not NULL
+        type: boolean
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: vincentronald9703@gmail.com
+    name: Vincent Ronald
+  description: Dokumentasi API untuk sistem POS Restoran
+  title: POS Restaurant API
+  version: "1.0"
+paths:
+  /ingredients:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Ingredient'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Tampilkan semua ingredient
+      tags:
+      - Ingredient
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Data ingredient baru
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.CreateIngredientRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Tambah ingredient baru
+      tags:
+      - Ingredient
+  /ingredients/{id}:
+    delete:
+      parameters:
+      - description: ID Ingredient
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Hapus (soft delete) ingredient berdasarkan ID
+      tags:
+      - Ingredient
+    get:
+      parameters:
+      - description: ID Ingredient
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Ingredient'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Ambil ingredient berdasarkan ID
+      tags:
+      - Ingredient
+  /menu/category:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.MenuCategory'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Tampilkan semua kategori menu
+      tags:
+      - Category
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Data kategori baru
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.CreateCategoryRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Tambah kategori menu baru
+      tags:
+      - Category
+  /menu/category/{id}:
+    delete:
+      parameters:
+      - description: ID Kategori
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Hapus (soft delete) kategori menu
+      tags:
+      - Category
+  /menu/menu-items:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.MenuItem'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: List semua menu
+      tags:
+      - Menu
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Data menu baru
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.CreateMenuItemRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Tambah menu baru
+      tags:
+      - Menu-Items
+  /menu/menu-items-active:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.MenuItem'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: List menu aktif
+      tags:
+      - Menu
+  /menu/menu-items/{id}:
+    delete:
+      parameters:
+      - description: ID Menu
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Hapus (soft delete) menu
+      tags:
+      - Menu
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: ID Menu
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Data menu yang diperbarui
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.CreateMenuItemRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Perbarui menu
+      tags:
+      - Menu
+  /menu/menu-items/category:
+    get:
+      parameters:
+      - description: ID Kategori
+        in: query
+        name: category_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.MenuItem'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Dapatkan menu berdasarkan kategori
+      tags:
+      - Menu
+  /menu/menu-items/detail/{id}:
+    get:
+      parameters:
+      - description: ID Menu
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.MenuItemWithIngredients'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Dapatkan detail menu dengan bahan
+      tags:
+      - Menu
+  /menu/menu-items/search:
+    get:
+      parameters:
+      - description: Kata kunci pencarian
+        in: query
+        name: search
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.MenuItem'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Cari menu berdasarkan keyword
+      tags:
+      - Menu
+  /tables:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Table'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Lihat semua data meja
+      tags:
+      - Table
+    post:
+      consumes:
+      - application/json
+      description: Menambahkan data meja baru ke dalam sistem
+      parameters:
+      - description: Data meja
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.newTableRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Tambah meja baru
+      tags:
+      - Table
+  /tables/{id}:
+    delete:
+      parameters:
+      - description: ID meja
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Hapus (soft delete) data meja
+      tags:
+      - Table
+    get:
+      parameters:
+      - description: ID meja
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Table'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Lihat detail meja berdasarkan ID
+      tags:
+      - Table
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: ID meja
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Data meja yang diperbarui
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.newTableRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Update data meja
+      tags:
+      - Table
+schemes:
+- http
+swagger: "2.0"

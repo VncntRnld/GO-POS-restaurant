@@ -28,6 +28,16 @@ type CreateIngredientRequest struct {
 	Description string  `json:"description"`
 }
 
+// CreateIngredient godoc
+// @Summary Tambah ingredient baru
+// @Tags Ingredient
+// @Accept json
+// @Produce json
+// @Param request body CreateIngredientRequest true "Data ingredient baru"
+// @Success 201 {object} map[string]interface{}
+// @Failure 400 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /ingredients [post]
 func (h *IngredientHandler) CreateIngredient(c *gin.Context) {
 	var req CreateIngredientRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -55,6 +65,13 @@ func (h *IngredientHandler) CreateIngredient(c *gin.Context) {
 	c.JSON(http.StatusCreated, gin.H{"id": id, "name": ingredient.Name})
 }
 
+// ListIngredients godoc
+// @Summary Tampilkan semua ingredient
+// @Tags Ingredient
+// @Produce json
+// @Success 200 {array} models.Ingredient
+// @Failure 500 {object} map[string]string
+// @Router /ingredients [get]
 func (h *IngredientHandler) ListIngredients(c *gin.Context) {
 	ingredients, err := h.service.ListIngredients(c.Request.Context())
 	if err != nil {
@@ -65,6 +82,15 @@ func (h *IngredientHandler) ListIngredients(c *gin.Context) {
 	c.JSON(http.StatusOK, ingredients)
 }
 
+// GetIngredientByID godoc
+// @Summary Ambil ingredient berdasarkan ID
+// @Tags Ingredient
+// @Produce json
+// @Param id path int true "ID Ingredient"
+// @Success 200 {object} models.Ingredient
+// @Failure 400 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /ingredients/{id} [get]
 func (h *IngredientHandler) GetIngredientByID(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
@@ -84,6 +110,15 @@ func (h *IngredientHandler) GetIngredientByID(c *gin.Context) {
 	c.JSON(http.StatusOK, ingredient)
 }
 
+// GetIngredientByID godoc
+// @Summary Ambil ingredient berdasarkan ID
+// @Tags Ingredient
+// @Produce json
+// @Param id path int true "ID Ingredient"
+// @Success 200 {object} models.Ingredient
+// @Failure 400 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /ingredients/{id} [get]
 func (h *IngredientHandler) UpdateIngredient(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
@@ -119,6 +154,15 @@ func (h *IngredientHandler) UpdateIngredient(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Ingredient berhasil diupdate"})
 }
 
+// DeleteIngredient godoc
+// @Summary Hapus (soft delete) ingredient berdasarkan ID
+// @Tags Ingredient
+// @Produce json
+// @Param id path int true "ID Ingredient"
+// @Success 200 {object} map[string]string
+// @Failure 400 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /ingredients/{id} [delete]
 func (h *IngredientHandler) DeleteIngredient(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
