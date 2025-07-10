@@ -31,6 +31,16 @@ type NewOrderRequest struct {
 	Items      []models.OrderItemInput `json:"items"`
 }
 
+// Create godoc
+// @Summary Buat order baru
+// @Tags Orders
+// @Accept json
+// @Produce json
+// @Param request body NewOrderRequest true "Data order baru"
+// @Success 201 {object} map[string]interface{}
+// @Failure 400 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /orders [post]
 func (h *OrderHandler) Create(c *gin.Context) {
 	var req NewOrderRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -60,6 +70,13 @@ func (h *OrderHandler) Create(c *gin.Context) {
 	c.JSON(http.StatusCreated, gin.H{"id": id})
 }
 
+// List godoc
+// @Summary Ambil semua order
+// @Tags Orders
+// @Produce json
+// @Success 200 {array} models.Order
+// @Failure 500 {object} map[string]string
+// @Router /orders [get]
 func (h *OrderHandler) List(c *gin.Context) {
 	orders, err := h.service.List(c.Request.Context())
 	if err != nil {
@@ -70,6 +87,15 @@ func (h *OrderHandler) List(c *gin.Context) {
 	c.JSON(http.StatusOK, orders)
 }
 
+// GetByID godoc
+// @Summary Ambil order berdasarkan ID
+// @Tags Orders
+// @Produce json
+// @Param id path int true "ID order"
+// @Success 200 {object} models.Order
+// @Failure 400 {object} map[string]string
+// @Failure 404 {object} map[string]string
+// @Router /orders/{id} [get]
 func (h *OrderHandler) GetByID(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -88,6 +114,17 @@ func (h *OrderHandler) GetByID(c *gin.Context) {
 	c.JSON(http.StatusOK, order)
 }
 
+// Update godoc
+// @Summary Perbarui data order
+// @Tags Orders
+// @Accept json
+// @Produce json
+// @Param id path int true "ID order"
+// @Param request body NewOrderRequest true "Data order yang diperbarui"
+// @Success 200 {object} map[string]string
+// @Failure 400 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /orders/{id} [put]
 func (h *OrderHandler) Update(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -124,6 +161,17 @@ func (h *OrderHandler) Update(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Order updated"})
 }
 
+// AddItem godoc
+// @Summary Tambahkan item ke order
+// @Tags Orders
+// @Accept json
+// @Produce json
+// @Param id path int true "ID order"
+// @Param request body models.AddOrderItemRequest true "Data item baru"
+// @Success 200 {object} map[string]string
+// @Failure 400 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /orders/{id}/add [post]
 func (h *OrderHandler) AddItem(c *gin.Context) {
 	orderID, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -148,6 +196,15 @@ func (h *OrderHandler) AddItem(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Item berhasil ditambahkan ke order"})
 }
 
+// Delete godoc
+// @Summary Soft delete order (status menjadi void)
+// @Tags Orders
+// @Produce json
+// @Param id path int true "ID order"
+// @Success 200 {object} map[string]string
+// @Failure 400 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /orders/{id} [delete]
 func (h *OrderHandler) Delete(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {

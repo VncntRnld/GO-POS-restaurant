@@ -26,6 +26,16 @@ type CreateMenuIngredientRequest struct {
 	IsDefault    bool    `json:"is_default"`
 }
 
+// Create godoc
+// @Summary Tambah menu ingredient baru
+// @Tags MenuIngredient
+// @Accept json
+// @Produce json
+// @Param request body CreateMenuIngredientRequest true "Data menu ingredient"
+// @Success 201 {object} map[string]int
+// @Failure 400 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /menu-ingredients [post]
 func (h *MenuIngredientHandler) Create(c *gin.Context) {
 	var req CreateMenuIngredientRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -52,6 +62,15 @@ func (h *MenuIngredientHandler) Create(c *gin.Context) {
 	c.JSON(http.StatusCreated, gin.H{"id": id})
 }
 
+// ListByMenuItem godoc
+// @Summary Tampilkan semua ingredient berdasarkan menu item
+// @Tags MenuIngredient
+// @Produce json
+// @Param menu_item_id path int true "ID Menu Item"
+// @Success 200 {array} models.MenuIngredient
+// @Failure 400 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /menu-ingredients/{menu_item_id} [get]
 func (h *MenuIngredientHandler) ListByMenuItem(c *gin.Context) {
 	idStr := c.Param("menu_item_id")
 	menuItemID, err := strconv.Atoi(idStr)
@@ -71,6 +90,17 @@ func (h *MenuIngredientHandler) ListByMenuItem(c *gin.Context) {
 	c.JSON(http.StatusOK, items)
 }
 
+// UpdateMenuIngredient godoc
+// @Summary Perbarui data menu ingredient
+// @Tags MenuIngredient
+// @Accept json
+// @Produce json
+// @Param id path int true "ID menu ingredient"
+// @Param request body CreateMenuIngredientRequest true "Data yang diperbarui"
+// @Success 200 {object} map[string]string
+// @Failure 400 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /menu-ingredients/{id} [put]
 func (h *MenuIngredientHandler) UpdateMenuIngredient(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
@@ -105,6 +135,15 @@ func (h *MenuIngredientHandler) UpdateMenuIngredient(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Menu ingredient berhasil diperbarui"})
 }
 
+// DeleteMenuIngredient godoc
+// @Summary Hapus menu ingredient berdasarkan ID
+// @Tags MenuIngredient
+// @Produce json
+// @Param id path int true "ID menu ingredient"
+// @Success 200 {object} map[string]string
+// @Failure 400 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /menu-ingredients/{id} [delete]
 func (h *MenuIngredientHandler) DeleteMenuIngredient(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)

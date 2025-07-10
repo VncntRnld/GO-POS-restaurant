@@ -27,6 +27,16 @@ type CreateTableTransferRequest struct {
 	Reason        string `json:"reason"`
 }
 
+// Create godoc
+// @Summary Buat data pemindahan meja
+// @Tags Table Transfers
+// @Accept json
+// @Produce json
+// @Param request body CreateTableTransferRequest true "Data pemindahan meja"
+// @Success 201 {object} map[string]interface{}
+// @Failure 400 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /table-transfers [post]
 func (h *TableTransferHandler) Create(c *gin.Context) {
 	var req CreateTableTransferRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -52,6 +62,13 @@ func (h *TableTransferHandler) Create(c *gin.Context) {
 	c.JSON(http.StatusCreated, gin.H{"id": id})
 }
 
+// List godoc
+// @Summary Ambil semua data pemindahan meja
+// @Tags Table Transfers
+// @Produce json
+// @Success 200 {array} models.TableTransfer
+// @Failure 500 {object} map[string]string
+// @Router /table-transfers [get]
 func (h *TableTransferHandler) List(c *gin.Context) {
 	data, err := h.service.List(c.Request.Context())
 	if err != nil {
@@ -61,6 +78,14 @@ func (h *TableTransferHandler) List(c *gin.Context) {
 	c.JSON(http.StatusOK, data)
 }
 
+// GetByID godoc
+// @Summary Ambil data pemindahan meja berdasarkan ID
+// @Tags Table Transfers
+// @Produce json
+// @Param id path int true "ID pemindahan meja"
+// @Success 200 {object} models.TableTransfer
+// @Failure 404 {object} map[string]string
+// @Router /table-transfers/{id} [get]
 func (h *TableTransferHandler) GetByID(c *gin.Context) {
 	id, _ := strconv.Atoi(c.Param("id"))
 	data, err := h.service.GetByID(c.Request.Context(), id)
@@ -71,6 +96,17 @@ func (h *TableTransferHandler) GetByID(c *gin.Context) {
 	c.JSON(http.StatusOK, data)
 }
 
+// Update godoc
+// @Summary Perbarui data pemindahan meja
+// @Tags Table Transfers
+// @Accept json
+// @Produce json
+// @Param id path int true "ID pemindahan meja"
+// @Param request body CreateTableTransferRequest true "Data pemindahan meja yang diperbarui"
+// @Success 200 {object} map[string]string
+// @Failure 400 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /table-transfers/{id} [put]
 func (h *TableTransferHandler) Update(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
@@ -103,6 +139,14 @@ func (h *TableTransferHandler) Update(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Data berhasil diperbarui"})
 }
 
+// Delete godoc
+// @Summary Hapus data pemindahan meja berdasarkan ID
+// @Tags Table Transfers
+// @Produce json
+// @Param id path int true "ID pemindahan meja"
+// @Success 200 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /table-transfers/{id} [delete]
 func (h *TableTransferHandler) Delete(c *gin.Context) {
 	id, _ := strconv.Atoi(c.Param("id"))
 	if err := h.service.Delete(c.Request.Context(), id); err != nil {

@@ -25,6 +25,16 @@ type StaffRequest struct {
 	IsActive bool   `json:"is_active"`
 }
 
+// Create godoc
+// @Summary Tambah staff baru
+// @Tags Staff
+// @Accept json
+// @Produce json
+// @Param request body StaffRequest true "Data staff"
+// @Success 201 {object} map[string]interface{}
+// @Failure 400 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /staff [post]
 func (h *StaffHandler) Create(c *gin.Context) {
 	var req StaffRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -46,6 +56,13 @@ func (h *StaffHandler) Create(c *gin.Context) {
 	c.JSON(http.StatusCreated, gin.H{"id": id, "message": "Staff berhasil ditambahkan"})
 }
 
+// List godoc
+// @Summary Lihat semua staff
+// @Tags Staff
+// @Produce json
+// @Success 200 {array} models.Staff
+// @Failure 500 {object} map[string]string
+// @Router /staff [get]
 func (h *StaffHandler) List(c *gin.Context) {
 	staff, err := h.service.ListStaff(c.Request.Context())
 	if err != nil {
@@ -56,6 +73,15 @@ func (h *StaffHandler) List(c *gin.Context) {
 	c.JSON(http.StatusOK, staff)
 }
 
+// GetByID godoc
+// @Summary Lihat staff berdasarkan ID
+// @Tags Staff
+// @Produce json
+// @Param id path int true "ID staff"
+// @Success 200 {object} models.Staff
+// @Failure 400 {object} map[string]string
+// @Failure 404 {object} map[string]string
+// @Router /staff/{id} [get]
 func (h *StaffHandler) GetByID(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -71,6 +97,17 @@ func (h *StaffHandler) GetByID(c *gin.Context) {
 	c.JSON(http.StatusOK, staff)
 }
 
+// Update godoc
+// @Summary Perbarui data staff
+// @Tags Staff
+// @Accept json
+// @Produce json
+// @Param id path int true "ID staff"
+// @Param request body StaffRequest true "Data staff yang diperbarui"
+// @Success 200 {object} map[string]string
+// @Failure 400 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /staff/{id} [put]
 func (h *StaffHandler) Update(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -97,6 +134,15 @@ func (h *StaffHandler) Update(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Staff berhasil diupdate"})
 }
 
+// SoftDelete godoc
+// @Summary Hapus (soft delete) staff
+// @Tags Staff
+// @Produce json
+// @Param id path int true "ID staff"
+// @Success 200 {object} map[string]string
+// @Failure 400 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /staff/{id} [delete]
 func (h *StaffHandler) SoftDelete(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {

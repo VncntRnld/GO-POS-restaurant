@@ -1,5 +1,31 @@
 basePath: /api
 definitions:
+  handlers.BillPaymentRequest:
+    properties:
+      amount:
+        type: number
+      bill_id:
+        type: integer
+      payment_method:
+        type: string
+      reference_number:
+        type: string
+      room_charge_approved_by:
+        type: integer
+    required:
+    - amount
+    - bill_id
+    - payment_method
+    type: object
+  handlers.CreateBillRequest:
+    properties:
+      discount_amount:
+        type: number
+      order_id:
+        type: integer
+    required:
+    - order_id
+    type: object
   handlers.CreateCategoryRequest:
     properties:
       name:
@@ -23,6 +49,23 @@ definitions:
         type: string
     required:
     - name
+    type: object
+  handlers.CreateMenuIngredientRequest:
+    properties:
+      ingredient_id:
+        type: integer
+      is_default:
+        type: boolean
+      is_removable:
+        type: boolean
+      menu_item_id:
+        type: integer
+      qty:
+        type: number
+    required:
+    - ingredient_id
+    - menu_item_id
+    - qty
     type: object
   handlers.CreateMenuItemRequest:
     properties:
@@ -55,6 +98,136 @@ definitions:
     - price
     - sku
     type: object
+  handlers.CreateOutletRequest:
+    properties:
+      is_active:
+        type: boolean
+      location:
+        type: string
+      name:
+        type: string
+      service_charge_percentage:
+        type: number
+      tax_percentage:
+        type: number
+    required:
+    - name
+    type: object
+  handlers.CreateReservationRequest:
+    properties:
+      customer_id:
+        type: integer
+      pax:
+        type: integer
+      reservation_time:
+        type: string
+      special_request:
+        type: string
+      status:
+        type: string
+      table_id:
+        type: integer
+    required:
+    - customer_id
+    - pax
+    - reservation_time
+    - status
+    - table_id
+    type: object
+  handlers.CreateTableTransferRequest:
+    properties:
+      from_table_id:
+        type: integer
+      order_id:
+        type: integer
+      reason:
+        type: string
+      to_table_id:
+        type: integer
+      transferred_by:
+        type: integer
+    required:
+    - from_table_id
+    - order_id
+    - to_table_id
+    - transferred_by
+    type: object
+  handlers.CustomerRequest:
+    properties:
+      hotel_guest_id:
+        type: string
+      last_visit:
+        description: ISO string expected
+        type: string
+      name:
+        type: string
+      phone:
+        type: string
+      type:
+        type: string
+      visit_count:
+        type: integer
+    required:
+    - name
+    - type
+    type: object
+  handlers.CustomerVisitRequest:
+    properties:
+      customer_id:
+        type: integer
+      outlet_id:
+        type: integer
+      pax:
+        type: integer
+      reservation_id:
+        type: integer
+      room_number:
+        type: string
+      total_spent:
+        type: number
+      visit_date:
+        type: string
+      visit_type:
+        type: string
+    type: object
+  handlers.NewOrderRequest:
+    properties:
+      customer_id:
+        type: integer
+      hotel_room:
+        type: string
+      id:
+        type: integer
+      items:
+        items:
+          $ref: '#/definitions/models.OrderItemInput'
+        type: array
+      order_type:
+        type: string
+      outlet_id:
+        type: integer
+      status:
+        type: string
+      table_id:
+        type: integer
+      waiter_id:
+        type: integer
+    type: object
+  handlers.StaffRequest:
+    properties:
+      is_active:
+        type: boolean
+      name:
+        type: string
+      pin_code:
+        type: string
+      role:
+        type: string
+    required:
+    - name
+    - pin_code
+    - role
+    type: object
   handlers.newTableRequest:
     properties:
       capacity:
@@ -66,6 +239,102 @@ definitions:
       status:
         type: string
       table_number:
+        type: string
+    type: object
+  models.AddOrderItemRequest:
+    properties:
+      excluded_ingredient_ids:
+        items:
+          type: integer
+        type: array
+      menu_item_id:
+        type: integer
+      notes:
+        type: string
+      qty:
+        type: number
+      unit_price:
+        description: captured per item
+        type: number
+    required:
+    - menu_item_id
+    - qty
+    type: object
+  models.Bill:
+    properties:
+      balance_due:
+        type: number
+      bill_number:
+        type: string
+      created_at:
+        type: string
+      discount_amount:
+        type: number
+      id:
+        type: integer
+      order_id:
+        type: integer
+      original_bill_id:
+        $ref: '#/definitions/sql.NullInt64'
+      paid_amount:
+        type: number
+      service_charge:
+        type: number
+      status:
+        type: string
+      subtotal:
+        type: number
+      tax_amount:
+        type: number
+      total_amount:
+        type: number
+      updated_at:
+        type: string
+    type: object
+  models.Customer:
+    properties:
+      created_at:
+        type: string
+      cust_id:
+        type: integer
+      hotel_guest_id:
+        $ref: '#/definitions/sql.NullString'
+      last_visit:
+        $ref: '#/definitions/sql.NullTime'
+      name:
+        type: string
+      phone:
+        $ref: '#/definitions/sql.NullString'
+      type:
+        type: string
+      updated_at:
+        type: string
+      visit_count:
+        type: integer
+    type: object
+  models.CustomerVisit:
+    properties:
+      created_at:
+        type: string
+      customer_id:
+        type: integer
+      id:
+        type: integer
+      outlet_id:
+        type: integer
+      pax:
+        type: integer
+      reservation_id:
+        $ref: '#/definitions/sql.NullInt64'
+      room_number:
+        $ref: '#/definitions/sql.NullString'
+      total_spent:
+        $ref: '#/definitions/sql.NullFloat64'
+      updated_at:
+        type: string
+      visit_date:
+        type: string
+      visit_type:
         type: string
     type: object
   models.Ingredient:
@@ -100,6 +369,25 @@ definitions:
       id:
         type: integer
       name:
+        type: string
+    type: object
+  models.MenuIngredient:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: integer
+      ingredient_id:
+        type: integer
+      is_default:
+        type: boolean
+      is_removable:
+        type: boolean
+      menu_item_id:
+        type: integer
+      qty:
+        type: number
+      updated_at:
         type: string
     type: object
   models.MenuItem:
@@ -170,6 +458,131 @@ definitions:
       updated_at:
         type: string
     type: object
+  models.Order:
+    properties:
+      created_at:
+        type: string
+      customer_id:
+        type: integer
+      hotel_room:
+        $ref: '#/definitions/sql.NullString'
+      id:
+        type: integer
+      order_number:
+        type: string
+      order_type:
+        type: string
+      outlet_id:
+        type: integer
+      status:
+        type: string
+      table_id:
+        type: integer
+      updated_at:
+        type: string
+      waiter_id:
+        type: integer
+    type: object
+  models.OrderItemInput:
+    properties:
+      excluded_ingredients:
+        items:
+          type: integer
+        type: array
+      id:
+        type: integer
+      menu_item_id:
+        type: integer
+      notes:
+        type: string
+      qty:
+        type: number
+      unit_price:
+        description: captured per item
+        type: number
+    type: object
+  models.Outlet:
+    properties:
+      created_at:
+        type: string
+      deleted_at:
+        $ref: '#/definitions/sql.NullTime'
+      id:
+        type: integer
+      is_active:
+        type: boolean
+      location:
+        $ref: '#/definitions/sql.NullString'
+      name:
+        type: string
+      service_charge_percentage:
+        type: number
+      tax_percentage:
+        type: number
+      updated_at:
+        type: string
+    type: object
+  models.Reservation:
+    properties:
+      created_at:
+        type: string
+      customer_id:
+        type: integer
+      id:
+        type: integer
+      pax:
+        type: integer
+      reservation_time:
+        type: string
+      special_request:
+        $ref: '#/definitions/sql.NullString'
+      status:
+        type: string
+      table_id:
+        type: integer
+      updated_at:
+        type: string
+    type: object
+  models.SplitBillInput:
+    properties:
+      discount_amount:
+        type: number
+      item_ids:
+        items:
+          type: integer
+        type: array
+    type: object
+  models.SplitBillRequest:
+    properties:
+      original_bill_id:
+        description: <- Tambahan
+        type: integer
+      original_order_id:
+        type: integer
+      splits:
+        items:
+          $ref: '#/definitions/models.SplitBillInput'
+        type: array
+    type: object
+  models.Staff:
+    properties:
+      created_at:
+        type: string
+      deleted_at:
+        $ref: '#/definitions/sql.NullTime'
+      id:
+        type: integer
+      is_active:
+        type: boolean
+      name:
+        type: string
+      pin_code:
+        type: string
+      role:
+        type: string
+      updated_at:
+        type: string
+    type: object
   models.Table:
     properties:
       capacity:
@@ -193,6 +606,31 @@ definitions:
         type: string
       updated_at:
         type: string
+    type: object
+  models.TableTransfer:
+    properties:
+      from_table_id:
+        type: integer
+      id:
+        type: integer
+      order_id:
+        type: integer
+      reason:
+        $ref: '#/definitions/sql.NullString'
+      to_table_id:
+        type: integer
+      transferred_at:
+        type: string
+      transferred_by:
+        type: integer
+    type: object
+  sql.NullFloat64:
+    properties:
+      float64:
+        type: number
+      valid:
+        description: Valid is true if Float64 is not NULL
+        type: boolean
     type: object
   sql.NullInt64:
     properties:
@@ -227,6 +665,342 @@ info:
   title: POS Restaurant API
   version: "1.0"
 paths:
+  /bills:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Bill'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Ambil semua tagihan
+      tags:
+      - Bills
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Data tagihan
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.CreateBillRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Buat tagihan untuk sebuah order
+      tags:
+      - Bills
+  /bills/{id}:
+    delete:
+      parameters:
+      - description: ID tagihan
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Soft delete tagihan
+      tags:
+      - Bills
+    get:
+      parameters:
+      - description: ID tagihan
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Bill'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Ambil tagihan berdasarkan ID
+      tags:
+      - Bills
+  /bills/pay:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Data pembayaran
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.BillPaymentRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Proses pembayaran tagihan
+      tags:
+      - Bills
+  /bills/split:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Data split bill
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.SplitBillRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Buat tagihan split dari satu order
+      tags:
+      - Bills
+  /customers:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Customer'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Ambil semua customer
+      tags:
+      - Customer
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Data customer baru
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.CustomerRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Tambah customer baru
+      tags:
+      - Customer
+  /customers/{id}:
+    delete:
+      parameters:
+      - description: ID Customer
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Hapus customer (soft delete)
+      tags:
+      - Customer
+    get:
+      parameters:
+      - description: ID Customer
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Customer'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Ambil customer berdasarkan ID
+      tags:
+      - Customer
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: ID Customer
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Data yang diperbarui
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.CustomerRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Update data customer
+      tags:
+      - Customer
   /ingredients:
     get:
       produces:
@@ -341,6 +1115,144 @@ paths:
       summary: Ambil ingredient berdasarkan ID
       tags:
       - Ingredient
+  /menu-ingredients:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Data menu ingredient
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.CreateMenuIngredientRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties:
+              type: integer
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Tambah menu ingredient baru
+      tags:
+      - MenuIngredient
+  /menu-ingredients/{id}:
+    delete:
+      parameters:
+      - description: ID menu ingredient
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Hapus menu ingredient berdasarkan ID
+      tags:
+      - MenuIngredient
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: ID menu ingredient
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Data yang diperbarui
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.CreateMenuIngredientRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Perbarui data menu ingredient
+      tags:
+      - MenuIngredient
+  /menu-ingredients/{menu_item_id}:
+    get:
+      parameters:
+      - description: ID Menu Item
+        in: path
+        name: menu_item_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.MenuIngredient'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Tampilkan semua ingredient berdasarkan menu item
+      tags:
+      - MenuIngredient
   /menu/category:
     get:
       produces:
@@ -670,6 +1582,816 @@ paths:
       summary: Cari menu berdasarkan keyword
       tags:
       - Menu
+  /orders:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Order'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Ambil semua order
+      tags:
+      - Orders
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Data order baru
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.NewOrderRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Buat order baru
+      tags:
+      - Orders
+  /orders/{id}:
+    delete:
+      parameters:
+      - description: ID order
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Soft delete order (status menjadi void)
+      tags:
+      - Orders
+    get:
+      parameters:
+      - description: ID order
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Order'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Ambil order berdasarkan ID
+      tags:
+      - Orders
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: ID order
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Data order yang diperbarui
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.NewOrderRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Perbarui data order
+      tags:
+      - Orders
+  /orders/{id}/add:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: ID order
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Data item baru
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.AddOrderItemRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Tambahkan item ke order
+      tags:
+      - Orders
+  /outlets:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Outlet'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Tampilkan semua outlet
+      tags:
+      - Outlet
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Data outlet
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.CreateOutletRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Tambah outlet baru
+      tags:
+      - Outlet
+  /outlets/{id}:
+    delete:
+      parameters:
+      - description: ID outlet
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Hapus outlet (soft delete)
+      tags:
+      - Outlet
+    get:
+      parameters:
+      - description: ID outlet
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Outlet'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Ambil data outlet berdasarkan ID
+      tags:
+      - Outlet
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: ID outlet
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Data outlet yang diperbarui
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.CreateOutletRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Perbarui outlet
+      tags:
+      - Outlet
+  /reservations:
+    get:
+      parameters:
+      - description: 'Kolom untuk sorting (default: reservation_time)'
+        in: query
+        name: sort
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Reservation'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Ambil semua reservasi
+      tags:
+      - Reservations
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Data reservasi
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.CreateReservationRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "409":
+          description: Meja sudah dipesan
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Tambah reservasi baru
+      tags:
+      - Reservations
+  /reservations/{id}:
+    delete:
+      parameters:
+      - description: ID reservasi
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Hapus reservasi berdasarkan ID
+      tags:
+      - Reservations
+    get:
+      parameters:
+      - description: ID reservasi
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Reservation'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Ambil detail reservasi berdasarkan ID
+      tags:
+      - Reservations
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: ID reservasi
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Data reservasi baru
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.CreateReservationRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Update data reservasi
+      tags:
+      - Reservations
+  /staff:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Staff'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Lihat semua staff
+      tags:
+      - Staff
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Data staff
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.StaffRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Tambah staff baru
+      tags:
+      - Staff
+  /staff/{id}:
+    delete:
+      parameters:
+      - description: ID staff
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Hapus (soft delete) staff
+      tags:
+      - Staff
+    get:
+      parameters:
+      - description: ID staff
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Staff'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Lihat staff berdasarkan ID
+      tags:
+      - Staff
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: ID staff
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Data staff yang diperbarui
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.StaffRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Perbarui data staff
+      tags:
+      - Staff
+  /table-transfers:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.TableTransfer'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Ambil semua data pemindahan meja
+      tags:
+      - Table Transfers
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Data pemindahan meja
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.CreateTableTransferRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Buat data pemindahan meja
+      tags:
+      - Table Transfers
+  /table-transfers/{id}:
+    delete:
+      parameters:
+      - description: ID pemindahan meja
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Hapus data pemindahan meja berdasarkan ID
+      tags:
+      - Table Transfers
+    get:
+      parameters:
+      - description: ID pemindahan meja
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.TableTransfer'
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Ambil data pemindahan meja berdasarkan ID
+      tags:
+      - Table Transfers
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: ID pemindahan meja
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Data pemindahan meja yang diperbarui
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.CreateTableTransferRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Perbarui data pemindahan meja
+      tags:
+      - Table Transfers
   /tables:
     get:
       produces:
@@ -824,6 +2546,147 @@ paths:
       summary: Update data meja
       tags:
       - Table
+  /visits:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.CustomerVisit'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Ambil semua data kunjungan customer
+      tags:
+      - Customer Visit
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Data kunjungan customer
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.CustomerVisitRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Tambah data kunjungan customer
+      tags:
+      - Customer Visit
+  /visits/{id}:
+    delete:
+      parameters:
+      - description: ID Kunjungan
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Hapus data kunjungan customer
+      tags:
+      - Customer Visit
+    get:
+      parameters:
+      - description: ID Kunjungan
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.CustomerVisit'
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Ambil detail kunjungan berdasarkan ID
+      tags:
+      - Customer Visit
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: ID Kunjungan
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Data yang diperbarui
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.CustomerVisitRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Update data kunjungan customer
+      tags:
+      - Customer Visit
 schemes:
 - http
 swagger: "2.0"

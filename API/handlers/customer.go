@@ -28,6 +28,16 @@ type CustomerRequest struct {
 	LastVisit    *string `json:"last_visit"` // ISO string expected
 }
 
+// Create godoc
+// @Summary Tambah customer baru
+// @Tags Customer
+// @Accept json
+// @Produce json
+// @Param request body CustomerRequest true "Data customer baru"
+// @Success 201 {object} map[string]interface{}
+// @Failure 400 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /customers [post]
 func (h *CustomerHandler) Create(c *gin.Context) {
 	var req CustomerRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -54,6 +64,13 @@ func (h *CustomerHandler) Create(c *gin.Context) {
 	c.JSON(http.StatusCreated, gin.H{"id": id, "name": customer.Name})
 }
 
+// List godoc
+// @Summary Ambil semua customer
+// @Tags Customer
+// @Produce json
+// @Success 200 {array} models.Customer
+// @Failure 500 {object} map[string]string
+// @Router /customers [get]
 func (h *CustomerHandler) List(c *gin.Context) {
 	data, err := h.service.GetAllCustomers(c.Request.Context())
 	if err != nil {
@@ -64,6 +81,15 @@ func (h *CustomerHandler) List(c *gin.Context) {
 	c.JSON(http.StatusOK, data)
 }
 
+// GetByID godoc
+// @Summary Ambil customer berdasarkan ID
+// @Tags Customer
+// @Produce json
+// @Param id path int true "ID Customer"
+// @Success 200 {object} models.Customer
+// @Failure 400 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /customers/{id} [get]
 func (h *CustomerHandler) GetByID(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -82,6 +108,17 @@ func (h *CustomerHandler) GetByID(c *gin.Context) {
 	c.JSON(http.StatusOK, customer)
 }
 
+// Update godoc
+// @Summary Update data customer
+// @Tags Customer
+// @Accept json
+// @Produce json
+// @Param id path int true "ID Customer"
+// @Param request body CustomerRequest true "Data yang diperbarui"
+// @Success 200 {object} map[string]string
+// @Failure 400 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /customers/{id} [put]
 func (h *CustomerHandler) Update(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -115,6 +152,15 @@ func (h *CustomerHandler) Update(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Customer berhasil diperbarui"})
 }
 
+// SoftDelete godoc
+// @Summary Hapus customer (soft delete)
+// @Tags Customer
+// @Produce json
+// @Param id path int true "ID Customer"
+// @Success 200 {object} map[string]string
+// @Failure 400 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /customers/{id} [delete]
 func (h *CustomerHandler) SoftDelete(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {

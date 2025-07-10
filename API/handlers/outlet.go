@@ -27,6 +27,16 @@ type CreateOutletRequest struct {
 	IsActive             bool    `json:"is_active"`
 }
 
+// Create godoc
+// @Summary Tambah outlet baru
+// @Tags Outlet
+// @Accept json
+// @Produce json
+// @Param request body CreateOutletRequest true "Data outlet"
+// @Success 201 {object} map[string]interface{}
+// @Failure 400 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /outlets [post]
 func (h *OutletHandler) Create(c *gin.Context) {
 	var req CreateOutletRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -52,6 +62,13 @@ func (h *OutletHandler) Create(c *gin.Context) {
 	c.JSON(http.StatusCreated, gin.H{"id": id, "message": "Outlet berhasil ditambahkan"})
 }
 
+// List godoc
+// @Summary Tampilkan semua outlet
+// @Tags Outlet
+// @Produce json
+// @Success 200 {array} models.Outlet
+// @Failure 500 {object} map[string]string
+// @Router /outlets [get]
 func (h *OutletHandler) List(c *gin.Context) {
 	outlets, err := h.service.ListOutlets(c.Request.Context())
 	if err != nil {
@@ -62,6 +79,16 @@ func (h *OutletHandler) List(c *gin.Context) {
 	c.JSON(http.StatusOK, outlets)
 }
 
+// GetByID godoc
+// @Summary Ambil data outlet berdasarkan ID
+// @Tags Outlet
+// @Produce json
+// @Param id path int true "ID outlet"
+// @Success 200 {object} models.Outlet
+// @Failure 400 {object} map[string]string
+// @Failure 404 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /outlets/{id} [get]
 func (h *OutletHandler) GetByID(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
@@ -83,6 +110,17 @@ func (h *OutletHandler) GetByID(c *gin.Context) {
 	c.JSON(http.StatusOK, outlet)
 }
 
+// Update godoc
+// @Summary Perbarui outlet
+// @Tags Outlet
+// @Accept json
+// @Produce json
+// @Param id path int true "ID outlet"
+// @Param request body CreateOutletRequest true "Data outlet yang diperbarui"
+// @Success 200 {object} map[string]string
+// @Failure 400 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /outlets/{id} [put]
 func (h *OutletHandler) Update(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
@@ -115,6 +153,15 @@ func (h *OutletHandler) Update(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Berhasil update outlet"})
 }
 
+// Delete godoc
+// @Summary Hapus outlet (soft delete)
+// @Tags Outlet
+// @Produce json
+// @Param id path int true "ID outlet"
+// @Success 200 {object} map[string]string
+// @Failure 400 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /outlets/{id} [delete]
 func (h *OutletHandler) Delete(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)

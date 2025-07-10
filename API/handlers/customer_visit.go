@@ -31,6 +31,16 @@ type CustomerVisitRequest struct {
 	Pax           int       `json:"pax"`
 }
 
+// Create godoc
+// @Summary Tambah data kunjungan customer
+// @Tags Customer Visit
+// @Accept json
+// @Produce json
+// @Param request body CustomerVisitRequest true "Data kunjungan customer"
+// @Success 201 {object} map[string]interface{}
+// @Failure 400 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /visits [post]
 func (h *CustomerVisitHandler) Create(c *gin.Context) {
 	var req CustomerVisitRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -60,6 +70,13 @@ func (h *CustomerVisitHandler) Create(c *gin.Context) {
 	c.JSON(http.StatusCreated, gin.H{"id": id})
 }
 
+// List godoc
+// @Summary Ambil semua data kunjungan customer
+// @Tags Customer Visit
+// @Produce json
+// @Success 200 {array} models.CustomerVisit
+// @Failure 500 {object} map[string]string
+// @Router /visits [get]
 func (h *CustomerVisitHandler) List(c *gin.Context) {
 	data, err := h.service.List(c.Request.Context())
 	if err != nil {
@@ -70,6 +87,14 @@ func (h *CustomerVisitHandler) List(c *gin.Context) {
 	c.JSON(http.StatusOK, data)
 }
 
+// GetByID godoc
+// @Summary Ambil detail kunjungan berdasarkan ID
+// @Tags Customer Visit
+// @Produce json
+// @Param id path int true "ID Kunjungan"
+// @Success 200 {object} models.CustomerVisit
+// @Failure 404 {object} map[string]string
+// @Router /visits/{id} [get]
 func (h *CustomerVisitHandler) GetByID(c *gin.Context) {
 	id, _ := strconv.Atoi(c.Param("id"))
 	data, err := h.service.GetByID(c.Request.Context(), id)
@@ -81,6 +106,17 @@ func (h *CustomerVisitHandler) GetByID(c *gin.Context) {
 	c.JSON(http.StatusOK, data)
 }
 
+// Update godoc
+// @Summary Update data kunjungan customer
+// @Tags Customer Visit
+// @Accept json
+// @Produce json
+// @Param id path int true "ID Kunjungan"
+// @Param request body CustomerVisitRequest true "Data yang diperbarui"
+// @Success 200 {object} map[string]string
+// @Failure 400 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /visits/{id} [put]
 func (h *CustomerVisitHandler) Update(c *gin.Context) {
 	id, _ := strconv.Atoi(c.Param("id"))
 
@@ -112,6 +148,14 @@ func (h *CustomerVisitHandler) Update(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Data berhasil diupdate"})
 }
 
+// Delete godoc
+// @Summary Hapus data kunjungan customer
+// @Tags Customer Visit
+// @Produce json
+// @Param id path int true "ID Kunjungan"
+// @Success 200 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /visits/{id} [delete]
 func (h *CustomerVisitHandler) Delete(c *gin.Context) {
 	id, _ := strconv.Atoi(c.Param("id"))
 	if err := h.service.Delete(c.Request.Context(), id); err != nil {

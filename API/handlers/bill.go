@@ -24,6 +24,16 @@ type CreateBillRequest struct {
 	DiscountAmount float64 `json:"discount_amount"`
 }
 
+// Create godoc
+// @Summary Buat tagihan untuk sebuah order
+// @Tags Bills
+// @Accept json
+// @Produce json
+// @Param request body CreateBillRequest true "Data tagihan"
+// @Success 201 {object} map[string]interface{}
+// @Failure 400 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /bills [post]
 func (h *BillHandler) Create(c *gin.Context) {
 	var req CreateBillRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -42,6 +52,16 @@ func (h *BillHandler) Create(c *gin.Context) {
 	c.JSON(http.StatusCreated, gin.H{"message": "Tagihan berhasil dibuat", "bill_id": billID})
 }
 
+// CreateSplit godoc
+// @Summary Buat tagihan split dari satu order
+// @Tags Bills
+// @Accept json
+// @Produce json
+// @Param request body models.SplitBillRequest true "Data split bill"
+// @Success 201 {object} map[string]interface{}
+// @Failure 400 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /bills/split [post]
 func (h *BillHandler) CreateSplit(c *gin.Context) {
 	var req models.SplitBillRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -60,6 +80,13 @@ func (h *BillHandler) CreateSplit(c *gin.Context) {
 	c.JSON(http.StatusCreated, gin.H{"message": "Split bill berhasil dibuat", "bill_ids": billIDs})
 }
 
+// List godoc
+// @Summary Ambil semua tagihan
+// @Tags Bills
+// @Produce json
+// @Success 200 {array} models.Bill
+// @Failure 500 {object} map[string]string
+// @Router /bills [get]
 func (h *BillHandler) List(c *gin.Context) {
 	bills, err := h.service.List(c.Request.Context())
 	if err != nil {
@@ -71,6 +98,16 @@ func (h *BillHandler) List(c *gin.Context) {
 	c.JSON(http.StatusOK, bills)
 }
 
+// GetByID godoc
+// @Summary Ambil tagihan berdasarkan ID
+// @Tags Bills
+// @Produce json
+// @Param id path int true "ID tagihan"
+// @Success 200 {object} models.Bill
+// @Failure 400 {object} map[string]string
+// @Failure 404 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /bills/{id} [get]
 func (h *BillHandler) GetByID(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
@@ -94,6 +131,14 @@ func (h *BillHandler) GetByID(c *gin.Context) {
 	c.JSON(http.StatusOK, bill)
 }
 
+// Delete godoc
+// @Summary Soft delete tagihan
+// @Tags Bills
+// @Produce json
+// @Param id path int true "ID tagihan"
+// @Success 200 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /bills/{id} [delete]
 func (h *BillHandler) Delete(c *gin.Context) {
 	id, _ := strconv.Atoi(c.Param("id"))
 	if err := h.service.SoftDelete(c.Request.Context(), id); err != nil {
@@ -111,6 +156,16 @@ type BillPaymentRequest struct {
 	RoomChargeApprovedBy int     `json:"room_charge_approved_by"`
 }
 
+// Pay godoc
+// @Summary Proses pembayaran tagihan
+// @Tags Bills
+// @Accept json
+// @Produce json
+// @Param request body BillPaymentRequest true "Data pembayaran"
+// @Success 200 {object} map[string]string
+// @Failure 400 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /bills/pay [post]
 func (h *BillHandler) Pay(c *gin.Context) {
 	var req BillPaymentRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
